@@ -36,4 +36,29 @@ public UserServiceImpl(UserRepository userRepository, PasswordEncoder passwordEn
     public List<User> getAllUsers() {
         return userRepository.findAll();
     }
+
+    @Override
+public User updateUser(String id, User updatedUser) {
+    Optional<User> optionalUser = userRepository.findById(id);
+    if (optionalUser.isPresent()) {
+        User existingUser = optionalUser.get();
+        existingUser.setUsername(updatedUser.getUsername());
+        existingUser.setEmail(updatedUser.getEmail());
+        // Password update karannam eṭath logic ekak danna puluwan
+        return userRepository.save(existingUser);
+    } else {
+        throw new RuntimeException("User not found");
+    }
+}
+
+@Override
+public void deleteUser(String id) {
+    if (userRepository.existsById(id)) {
+        userRepository.deleteById(id);
+    } else {
+        throw new RuntimeException("User not found");
+    }
+}
+
+
 }
