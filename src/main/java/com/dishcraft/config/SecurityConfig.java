@@ -1,4 +1,3 @@
-// src/main/java/com/dishcraft/config/SecurityConfig.java
 package com.dishcraft.config;
 
 import org.springframework.context.annotation.Bean;
@@ -20,16 +19,11 @@ public class SecurityConfig {
     }
 
     @Bean
-    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
-        http
-            .csrf().disable()
-            .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-            .and()
-            .authorizeHttpRequests()
-                .requestMatchers("/api/users/**").permitAll()
-                .requestMatchers("/api/recipes/**").authenticated()
-                .anyRequest().permitAll();
-        
-        return http.build();
-    }
+public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+    http
+        .csrf().disable()
+        .authorizeHttpRequests()
+        .anyRequest().permitAll(); // 🔓 Allow all endpoints
+    return http.build();
+}
 }

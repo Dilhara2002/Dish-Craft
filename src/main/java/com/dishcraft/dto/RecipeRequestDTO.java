@@ -1,7 +1,7 @@
-// src/main/java/com/dishcraft/dto/RecipeRequestDTO.java
 package com.dishcraft.dto;
 
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotEmpty;
 import lombok.Data;
 import java.util.List;
 
@@ -12,11 +12,11 @@ public class RecipeRequestDTO {
     
     private String description;
     
-    @NotBlank(message = "Ingredients are required")
+    @NotEmpty(message = "Ingredients are required")
     private List<String> ingredients;
     
-    @NotBlank(message = "Instructions are required")
-    private String instructions;
+    @NotEmpty(message = "Instructions are required")
+    private List<String> instructions;  // FIXED to List<String>
     
     private String imageUrl;
     private List<String> tags;

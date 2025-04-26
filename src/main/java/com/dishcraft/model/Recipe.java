@@ -13,14 +13,12 @@ import java.util.List;
 public class Recipe {
     @Id
     private String id;
-    private String title;
+    
+    private String title;          // FIX: previously was "name"
     private String description;
     private List<String> ingredients;
-    private String instructions;
+    private List<String> instructions;  // FIX: previously was "steps"
     private String imageUrl;
-    private String userId;
     private List<String> tags;
-    
-    @Builder.Default
-    private int likes = 0;
+    private String userId; // reference to user who created it
 }

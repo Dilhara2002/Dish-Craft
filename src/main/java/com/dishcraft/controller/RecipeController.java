@@ -21,8 +21,8 @@ public class RecipeController {
     }
 
     @PostMapping
-    public Recipe createRecipe(@Valid @RequestBody RecipeRequestDTO recipeDTO, 
-                             @RequestHeader("userId") String userId) {
+    public Recipe createRecipe(@Valid @RequestBody RecipeRequestDTO recipeDTO,
+                               @RequestHeader("userId") String userId) {
         Recipe recipe = Recipe.builder()
                 .title(recipeDTO.getTitle())
                 .description(recipeDTO.getDescription())
@@ -51,11 +51,11 @@ public class RecipeController {
     }
 
     @PutMapping("/{id}")
-    public Recipe updateRecipe(@PathVariable String id, 
-                             @Valid @RequestBody RecipeRequestDTO recipeDTO,
-                             @RequestHeader("userId") String userId) {
+    public Recipe updateRecipe(@PathVariable String id,
+                               @Valid @RequestBody RecipeRequestDTO recipeDTO,
+                               @RequestHeader("userId") String userId) {
         Recipe existingRecipe = recipeService.getRecipeById(id);
-        if(existingRecipe != null && existingRecipe.getUserId().equals(userId)) {
+        if (existingRecipe != null && existingRecipe.getUserId().equals(userId)) {
             existingRecipe.setTitle(recipeDTO.getTitle());
             existingRecipe.setDescription(recipeDTO.getDescription());
             existingRecipe.setIngredients(recipeDTO.getIngredients());
@@ -64,14 +64,14 @@ public class RecipeController {
             existingRecipe.setTags(recipeDTO.getTags());
             return recipeService.updateRecipe(existingRecipe);
         }
-        return null; // or throw exception
+        return null; // or you can throw a custom exception
     }
 
     @DeleteMapping("/{id}")
-    public void deleteRecipe(@PathVariable String id, 
-                           @RequestHeader("userId") String userId) {
+    public void deleteRecipe(@PathVariable String id,
+                             @RequestHeader("userId") String userId) {
         Recipe recipe = recipeService.getRecipeById(id);
-        if(recipe != null && recipe.getUserId().equals(userId)) {
+        if (recipe != null && recipe.getUserId().equals(userId)) {
             recipeService.deleteRecipe(id);
         }
     }
