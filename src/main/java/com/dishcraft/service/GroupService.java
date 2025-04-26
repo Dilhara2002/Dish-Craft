@@ -9,4 +9,5 @@ public interface GroupService {
     List<Group> getAllGroups();
     Group getGroupById(String id);
     Group joinGroup(String groupId, String userId);
+    void deleteGroup(String groupId);
 }

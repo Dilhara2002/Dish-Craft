@@ -44,4 +44,8 @@ public class GroupController {
     public Group joinGroup(@PathVariable String groupId, @RequestHeader("userId") String userId) {
         return groupService.joinGroup(groupId, userId);
     }
+    @DeleteMapping("/{groupId}")
+public void deleteGroup(@PathVariable String groupId) {
+    groupService.deleteGroup(groupId);
+}
 }
