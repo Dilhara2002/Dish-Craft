@@ -1,20 +1,24 @@
 import React from 'react';
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { ThemeProvider, createTheme } from '@mui/material/styles';
 import CssBaseline from '@mui/material/CssBaseline';
 
-// Import only the pages you've actually created
+// Page imports
 import HomePage from './pages/HomePage';
 import LoginPage from './pages/LoginPage';
+import RegisterPage from './pages/RegisterPage';
+import ProfilePage from './pages/ProfilePage';
 import NotFoundPage from './pages/NotFoundPage';
 
-// Import components
+// Component imports
 import Navbar from './components/Navbar';
 import Footer from './components/Footer';
-import PrivateRoute from './components/PrivateRoute';
+import RecipeList from './components/RecipeList';
+import RecipeDetail from './components/RecipeDetail';
+import RecipeForm from './components/RecipeForm';
 
-// Import contexts
-import { AuthProvider } from './context/AuthContext';
+// Context imports
+import { AuthProvider, useAuth } from './context/AuthContext';
 import { NotificationProvider } from './context/NotificationContext';
 
 const theme = createTheme({
@@ -34,6 +38,11 @@ const theme = createTheme({
   },
 });
 
+const PrivateRoute = ({ children }) => {
+  const { user } = useAuth();
+  return user ? children : <Navigate to="/login" replace />;
+};
+
 function App() {
   return (
     <ThemeProvider theme={theme}>
@@ -46,8 +55,32 @@ function App() {
               
               <main className="main-content">
                 <Routes>
+                  {/* Public Routes */}
                   <Route path="/" element={<HomePage />} />
                   <Route path="/login" element={<LoginPage />} />
+                  <Route path="/register" element={<RegisterPage />} />
+                  <Route path="/recipes" element={<RecipeList />} />
+                  <Route path="/recipes/:id" element={<RecipeDetail />} />
+                  <Route path="/users/:userId" element={<ProfilePage />} />
+                  
+                  {/* Private Routes */}
+                  <Route path="/create-recipe" element={
+                    <PrivateRoute>
+                      <RecipeForm />
+                    </PrivateRoute>
+                  } />
+                  <Route path="/my-recipes" element={
+                    <PrivateRoute>
+                      <RecipeList userOnly />
+                    </PrivateRoute>
+                  } />
+                  <Route path="/edit-recipe/:id" element={
+                    <PrivateRoute>
+                      <RecipeForm editMode />
+                    </PrivateRoute>
+                  } />
+                  
+                  {/* 404 Not Found */}
                   <Route path="*" element={<NotFoundPage />} />
                 </Routes>
               </main>
@@ -61,4 +94,4 @@ function App() {
   );
 }
 
-export default App; // Make sure this default export exists
+export default App;
