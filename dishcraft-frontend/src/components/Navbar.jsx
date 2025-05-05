@@ -1,12 +1,105 @@
 import { Link } from 'react-router-dom';
 
-const Navbar = () => {
+const Navbar = ({ isLoggedIn = false }) => {
+  // Inline styles
+  const styles = {
+    navbar: {
+      backgroundColor: "#ffffff",
+      boxShadow: "0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06)",
+      padding: "16px",
+      display: "flex",
+      justifyContent: "space-between",
+      alignItems: "center",
+      position: "sticky",
+      top: 0,
+      zIndex: 50
+    },
+    brandLink: {
+      fontSize: "20px",
+      fontWeight: "700",
+      color: "#f59e0b",
+      textDecoration: "none",
+      display: "flex",
+      alignItems: "center",
+      gap: "8px"
+    },
+    navLinks: {
+      display: "flex",
+      gap: "24px",
+      alignItems: "center"
+    },
+    navLink: {
+      color: "#4b5563",
+      textDecoration: "none",
+      fontWeight: "500",
+      fontSize: "15px",
+      transition: "all 0.2s ease-in-out",
+      padding: "8px 12px",
+      borderRadius: "6px",
+      "&:hover": {
+        color: "#f59e0b",
+        backgroundColor: "#fffbeb"
+      }
+    },
+    activeLink: {
+      color: "#f59e0b",
+      backgroundColor: "#fffbeb"
+    },
+    profileSection: {
+      display: "flex",
+      alignItems: "center",
+      gap: "16px"
+    },
+    profileImage: {
+      width: "36px",
+      height: "36px",
+      borderRadius: "50%",
+      objectFit: "cover",
+      border: "2px solid #f59e0b"
+    }
+  };
+
   return (
-    <nav className="bg-white shadow p-4 flex justify-between items-center">
-      <Link to="/" className="text-xl font-bold text-blue-600">Dish Craft</Link>
-      <div className="space-x-4">
-        <Link to="/login" className="text-gray-600 hover:text-blue-600">Login</Link>
-        <Link to="/register" className="text-gray-600 hover:text-blue-600">Register</Link>
+    <nav style={styles.navbar}>
+      <Link to="/" style={styles.brandLink}>
+        <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="#f59e0b">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+        </svg>
+        Dish Craft
+      </Link>
+      
+      <div style={styles.navLinks}>
+        {/* Always visible links */}
+        <Link to="/CreateRecipe" style={styles.navLink}>Recipes</Link>
+        <Link to="/groups" style={styles.navLink}>Community Groups</Link>
+        
+        {isLoggedIn ? (
+          <>
+            {/* Logged-in user links */}
+            <Link to="/create-post" style={styles.navLink}>Create Post</Link>
+            <Link to="/notifications" style={styles.navLink}>
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
+              </svg>
+            </Link>
+            
+            <div style={styles.profileSection}>
+              <Link to="/profile" style={styles.navLink}>
+                <img 
+                  src="https://via.placeholder.com/150" 
+                  alt="Profile" 
+                  style={styles.profileImage}
+                />
+              </Link>
+            </div>
+          </>
+        ) : (
+          <>
+            {/* Guest user links */}
+            <Link to="/login" style={styles.navLink}>Login</Link>
+            <Link to="/register" style={styles.navLink}>Register</Link>
+          </>
+        )}
       </div>
     </nav>
   );
