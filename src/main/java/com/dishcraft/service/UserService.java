@@ -13,4 +13,10 @@ public interface UserService {
     User updateUser(String id, User user);
     void deleteUser(String id);
     Optional<User> getUserById(String id);
+
+     // Admin-specific methods
+     List<User> findAllUsers();
+     User promoteToAdmin(String id);
+     User demoteFromAdmin(String id);
+     List<User> searchUsers(String keyword);
 }
