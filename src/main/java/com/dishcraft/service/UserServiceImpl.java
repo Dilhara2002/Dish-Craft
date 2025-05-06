@@ -5,6 +5,7 @@ import com.dishcraft.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import com.dishcraft.model.Role;
 
 import java.util.List;
 import java.util.Optional;
@@ -71,5 +72,32 @@ public UserServiceImpl(UserRepository userRepository, PasswordEncoder passwordEn
         }
         userRepository.deleteById(id);
     }
+
+    @Override
+    public List<User> findAllUsers() {
+        return userRepository.findAll();
+    }
+
+    @Override
+    public User promoteToAdmin(String id) {
+        User user = userRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("User not found with id: " + id));
+        user.addRole(Role.ADMIN);
+        return userRepository.save(user);
+    }
+
+    @Override
+    public User demoteFromAdmin(String id) {
+        User user = userRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("User not found with id: " + id));
+        user.removeRole(Role.ADMIN);
+        return userRepository.save(user);
+    }
+
+    @Override
+    public List<User> searchUsers(String keyword) {
+        return userRepository.findByUsernameContainingOrEmailContaining(keyword, keyword);
+    }
+   
 }
 
