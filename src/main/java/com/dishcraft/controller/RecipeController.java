@@ -1,578 +1,83 @@
-import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
-import axios from 'axios';
+// src/main/java/com/dishcraft/controller/RecipeController.java
+package com.dishcraft.controller;
 
-const Home = () => {
-    const navigate = useNavigate();
-    const [recipePosts, setRecipePosts] = useState([]);
-    const [loading, setLoading] = useState(true);
-    const [error, setError] = useState(null);
+import com.dishcraft.dto.RecipeRequestDTO;
+import com.dishcraft.model.Recipe;
+import com.dishcraft.service.RecipeService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.*;
+import jakarta.validation.Valid;
+import java.util.List;
 
-    const [newTitle, setNewTitle] = useState('');
-    const [newImage, setNewImage] = useState('');
-    const [newDescription, setNewDescription] = useState('');
-    const [editingPost, setEditingPost] = useState(null);
-    const [editTitle, setEditTitle] = useState('');
-    const [editImage, setEditImage] = useState('');
-    const [editDescription, setEditDescription] = useState('');
+@RestController
+@RequestMapping("/api/recipes")
+public class RecipeController {
 
-    // Fetch recipes from backend
-    useEffect(() => {
-        const fetchRecipes = async () => {
-            try {
-                const response = await axios.get('/api/recipes');
-                const formattedRecipes = response.data.map(recipe => ({
-                    id: recipe._id || recipe.id,
-                    user: recipe.userId || 'Anonymous',
-                    avatar: 'https://randomuser.me/api/portraits/lego/1.jpg',
-                    time: 'Recently',
-                    image: recipe.imageUrl,
-                    title: recipe.title,
-                    description: recipe.description,
-                    likes: 0,
-                    comments: 0,
-                    shares: 0
-                }));
-                setRecipePosts(formattedRecipes);
-                setLoading(false);
-            } catch (err) {
-                setError(err.message);
-                setLoading(false);
-                console.error('Error fetching recipes:', err);
-            }
-        };
+    private final RecipeService recipeService;
 
-        fetchRecipes();
-    }, []);
-
-    const handleAddRecipe = async () => {
-        if (!newTitle.trim() || !newImage.trim()) return;
-
-        try {
-            const response = await axios.post('/api/recipes', {
-                title: newTitle,
-                description: newDescription,
-                imageUrl: newImage,
-                ingredients: [], // Add these fields if needed
-                instructions: [], // Add these fields if needed
-                tags: [] // Add these fields if needed
-            }, {
-                headers: {
-                    'userId': 'current-user-id' // Replace with actual user ID from auth
-                }
-            });
-
-            const newRecipe = {
-                id: response.data._id,
-                user: 'You',
-                avatar: 'https://randomuser.me/api/portraits/lego/1.jpg',
-                time: 'Just now',
-                image: response.data.imageUrl,
-                title: response.data.title,
-                description: response.data.description,
-                likes: 0,
-                comments: 0,
-                shares: 0
-            };
-
-            setRecipePosts([newRecipe, ...recipePosts]);
-            setNewTitle('');
-            setNewImage('');
-            setNewDescription('');
-        } catch (err) {
-            console.error('Error adding recipe:', err);
-            setError('Failed to add recipe');
-        }
-    };
-
-    const handleDeleteRecipe = async (id) => {
-        try {
-            await axios.delete(`/api/recipes/${id}`, {
-                headers: {
-                    'userId': 'current-user-id' // Replace with actual user ID from auth
-                }
-            });
-            setRecipePosts(recipePosts.filter(post => post.id !== id));
-        } catch (err) {
-            console.error('Error deleting recipe:', err);
-            setError('Failed to delete recipe');
-        }
-    };
-
-    const handleEditRecipe = (post) => {
-        setEditingPost(post.id);
-        setEditTitle(post.title);
-        setEditImage(post.image);
-        setEditDescription(post.description);
-    };
-
-    const handleUpdateRecipe = async () => {
-        if (!editTitle.trim() || !editImage.trim()) return;
-
-        try {
-            const response = await axios.put(`/api/recipes/${editingPost}`, {
-                title: editTitle,
-                description: editDescription,
-                imageUrl: editImage,
-                ingredients: [], // Add these fields if needed
-                instructions: [], // Add these fields if needed
-                tags: [] // Add these fields if needed
-            }, {
-                headers: {
-                    'userId': 'current-user-id' // Replace with actual user ID from auth
-                }
-            });
-
-            setRecipePosts(recipePosts.map(post => 
-                post.id === editingPost 
-                    ? { 
-                        ...post, 
-                        title: response.data.title, 
-                        image: response.data.imageUrl, 
-                        description: response.data.description,
-                        time: 'Recently (edited)'
-                    } 
-                    : post
-            ));
-
-            setEditingPost(null);
-            setEditTitle('');
-            setEditImage('');
-            setEditDescription('');
-        } catch (err) {
-            console.error('Error updating recipe:', err);
-            setError('Failed to update recipe');
-        }
-    };
-
-    const handleCancelEdit = () => {
-        setEditingPost(null);
-        setEditTitle('');
-        setEditImage('');
-        setEditDescription('');
-    };
-
-    const styles = {
-        container: {
-            display: 'flex',
-            justifyContent: 'center',
-            backgroundImage: 'url("https://cdn.pixabay.com/photo/2018/04/13/17/12/vegetable-skewer-3317055_1280.jpg")',
-            backgroundSize: 'cover',
-            backgroundRepeat: 'no-repeat',
-            backgroundPosition: 'center center',
-            minHeight: '100vh',
-            padding: '20px 0',
-            fontFamily: "'Segoe UI', Tahoma, Geneva, Verdana, sans-serif"
-        },
-        mainContent: {
-            width: '100%',
-            maxWidth: '600px',
-            margin: '0 auto',
-            padding: '0 15px'
-        },
-        createPost: {
-            backgroundColor: '#ffffff',
-            borderRadius: '12px',
-            padding: '40px',
-            marginBottom: '20px',
-            boxShadow: '0 2px 8px rgba(0, 0, 0, 0.1)'
-        },
-        postInput: {
-            width: '100%',
-            padding: '12px 15px',
-            marginBottom: '10px',
-            border: '1px solid #e0e0e0',
-            borderRadius: '8px',
-            fontSize: '14px',
-            backgroundColor: '#f9f9f9',
-            transition: 'border 0.3s ease',
-            outline: 'none',
-            '&:focus': {
-                borderColor: '#ff6b6b',
-                backgroundColor: '#fff'
-            }
-        },
-        inputField: {
-            width: '100%',
-            padding: '12px 15px',
-            marginBottom: '10px',
-            border: '1px solid #e0e0e0',
-            borderRadius: '8px',
-            fontSize: '14px',
-            backgroundColor: '#f9f9f9',
-            transition: 'border 0.3s ease',
-            outline: 'none',
-            '&:focus': {
-                borderColor: '#ff6b6b',
-                backgroundColor: '#fff'
-            }
-        },
-        postButton: {
-            backgroundColor: '#ff6b6b',
-            color: 'white',
-            border: 'none',
-            padding: '10px 20px',
-            borderRadius: '8px',
-            cursor: 'pointer',
-            fontSize: '14px',
-            fontWeight: '600',
-            transition: 'background-color 0.3s ease',
-            width: '100%',
-            '&:hover': {
-                backgroundColor: '#ff5252'
-            }
-        },
-        recipePost: {
-            backgroundColor: '#ffffff',
-            borderRadius: '12px',
-            marginBottom: '20px',
-            overflow: 'hidden',
-            boxShadow: '0 2px 8px rgba(0, 0, 0, 0.1)',
-            transition: 'transform 0.3s ease',
-            '&:hover': {
-                transform: 'translateY(-2px)'
-            }
-        },
-        postHeader: {
-            display: 'flex',
-            alignItems: 'center',
-            padding: '15px',
-            borderBottom: '1px solid #f0f0f0'
-        },
-        avatar: {
-            width: '40px',
-            height: '40px',
-            borderRadius: '50%',
-            objectFit: 'cover',
-            marginRight: '12px'
-        },
-        userInfo: {
-            flex: '1'
-        },
-        userName: {
-            margin: '0',
-            fontSize: '16px',
-            fontWeight: '600',
-            color: '#333'
-        },
-        postTime: {
-            margin: '0',
-            fontSize: '12px',
-            color: '#999'
-        },
-        postImage: {
-            width: '100%',
-            height: '300px',
-            objectFit: 'cover',
-            borderBottom: '1px solid #f0f0f0',
-            borderTop: '1px solid #f0f0f0'
-        },
-        postContent: {
-            padding: '15px'
-        },
-        postTitle: {
-            margin: '0 0 10px 0',
-            fontSize: '18px',
-            fontWeight: '600',
-            color: '#333'
-        },
-        postDescription: {
-            margin: '0',
-            fontSize: '14px',
-            color: '#666',
-            lineHeight: '1.5'
-        },
-        postActions: {
-            display: 'flex',
-            justifyContent: 'space-between',
-            padding: '10px 15px',
-            borderTop: '1px solid #f0f0f0'
-        },
-        actionButton: {
-            backgroundColor: 'transparent',
-            border: 'none',
-            color: '#666',
-            padding: '8px 12px',
-            borderRadius: '6px',
-            cursor: 'pointer',
-            fontSize: '14px',
-            display: 'flex',
-            alignItems: 'center',
-            transition: 'all 0.3s ease',
-            '&:hover': {
-                backgroundColor: '#f5f5f5',
-                color: '#ff6b6b'
-            }
-        },
-        exploreButton: {
-            backgroundColor: '#4CAF50',
-            color: 'white',
-            border: 'none',
-            padding: '12px 20px',
-            borderRadius: '8px',
-            cursor: 'pointer',
-            fontSize: '16px',
-            fontWeight: '600',
-            transition: 'background-color 0.3s ease',
-            width: '100%',
-            marginTop: '20px',
-            '&:hover': {
-                backgroundColor: '#3e8e41'
-            }
-        },
-        formTitle: {
-            margin: '0 0 15px 0',
-            fontSize: '18px',
-            fontWeight: '600',
-            color: '#333',
-            textAlign: 'center'
-        },
-        textarea: {
-            width: '100%',
-            padding: '12px 15px',
-            marginBottom: '10px',
-            border: '1px solid #e0e0e0',
-            borderRadius: '8px',
-            fontSize: '14px',
-            backgroundColor: '#f9f9f9',
-            minHeight: '80px',
-            resize: 'vertical',
-            outline: 'none',
-            transition: 'border 0.3s ease',
-            '&:focus': {
-                borderColor: '#ff6b6b',
-                backgroundColor: '#fff'
-            }
-        },
-        editForm: {
-            padding: '15px',
-            border: '1px solid #e0e0e0',
-            borderRadius: '8px',
-            margin: '10px 0',
-            backgroundColor: '#f9f9f9'
-        },
-        buttonGroup: {
-            display: 'flex',
-            gap: '10px',
-            marginTop: '10px'
-        },
-        updateButton: {
-            backgroundColor: '#4CAF50',
-            color: 'white',
-            border: 'none',
-            padding: '8px 15px',
-            borderRadius: '6px',
-            cursor: 'pointer',
-            fontSize: '14px',
-            flex: '1',
-            '&:hover': {
-                backgroundColor: '#3e8e41'
-            }
-        },
-        cancelButton: {
-            backgroundColor: '#f44336',
-            color: 'white',
-            border: 'none',
-            padding: '8px 15px',
-            borderRadius: '6px',
-            cursor: 'pointer',
-            fontSize: '14px',
-            flex: '1',
-            '&:hover': {
-                backgroundColor: '#d32f2f'
-            }
-        },
-        deleteButton: {
-            backgroundColor: '#f44336',
-            color: 'white',
-            border: 'none',
-            padding: '8px 15px',
-            borderRadius: '6px',
-            cursor: 'pointer',
-            fontSize: '14px',
-            '&:hover': {
-                backgroundColor: '#d32f2f'
-            }
-        },
-        editButton: {
-            backgroundColor: '#2196F3',
-            color: 'white',
-            border: 'none',
-            padding: '8px 15px',
-            borderRadius: '6px',
-            cursor: 'pointer',
-            fontSize: '14px',
-            '&:hover': {
-                backgroundColor: '#0b7dda'
-            }
-        },
-        userActions: {
-            display: 'flex',
-            gap: '10px'
-        },
-        loading: {
-            textAlign: 'center',
-            padding: '20px',
-            color: '#fff',
-            fontSize: '18px'
-        },
-        error: {
-            textAlign: 'center',
-            padding: '20px',
-            color: '#ff6b6b',
-            backgroundColor: 'rgba(255, 255, 255, 0.8)',
-            borderRadius: '8px',
-            marginBottom: '20px'
-        }
-    };
-
-    if (loading) {
-        return (
-            <div style={styles.container}>
-                <div style={styles.loading}>Loading recipes...</div>
-            </div>
-        );
+    @Autowired
+    public RecipeController(RecipeService recipeService) {
+        this.recipeService = recipeService;
     }
 
-    if (error) {
-        return (
-            <div style={styles.container}>
-                <div style={styles.error}>Error: {error}</div>
-            </div>
-        );
+    @PostMapping
+    public Recipe createRecipe(@Valid @RequestBody RecipeRequestDTO recipeDTO, 
+                             @RequestHeader("userId") String userId) {
+        Recipe recipe = Recipe.builder()
+                .title(recipeDTO.getTitle())
+                .description(recipeDTO.getDescription())
+                .ingredients(recipeDTO.getIngredients())
+                .instructions(recipeDTO.getInstructions())
+                .imageUrl(recipeDTO.getImageUrl())
+                .tags(recipeDTO.getTags())
+                .userId(userId)
+                .build();
+        return recipeService.createRecipe(recipe);
     }
 
-    return (
-        <div style={styles.container}>
-            <div style={styles.mainContent}>
-                {error && <div style={styles.error}>{error}</div>}
+    @GetMapping
+    public List<Recipe> getAllRecipes() {
+        return recipeService.getAllRecipes();
+    }
 
-                {/* Add New Recipe Section */}
-                <div style={styles.createPost}>
-                    <h3 style={styles.formTitle}>Add New Recipe</h3>
-                    <input
-                        type="text"
-                        placeholder="Recipe title"
-                        style={styles.inputField}
-                        value={newTitle}
-                        onChange={(e) => setNewTitle(e.target.value)}
-                    />
-                    <input
-                        type="text"
-                        placeholder="Image URL"
-                        style={styles.inputField}
-                        value={newImage}
-                        onChange={(e) => setNewImage(e.target.value)}
-                    />
-                    <textarea
-                        placeholder="Recipe description"
-                        style={styles.textarea}
-                        value={newDescription}
-                        onChange={(e) => setNewDescription(e.target.value)}
-                    />
-                    <button style={styles.postButton} onClick={handleAddRecipe}>
-                        Add Recipe
-                    </button>
-                </div>
+    @GetMapping("/{id}")
+    public Recipe getRecipeById(@PathVariable String id) {
+        return recipeService.getRecipeById(id);
+    }
 
-                {/* Recipe Feed */}
-                {recipePosts.map(post => (
-                    <div key={post.id} style={styles.recipePost}>
-                        <div style={styles.postHeader}>
-                            <img src={post.avatar} alt={post.user} style={styles.avatar} />
-                            <div style={styles.userInfo}>
-                                <h3 style={styles.userName}>{post.user}</h3>
-                                <p style={styles.postTime}>{post.time}</p>
-                            </div>
-                            {post.user === 'You' && (
-                                <div style={styles.userActions}>
-                                    <button 
-                                        style={styles.editButton} 
-                                        onClick={() => handleEditRecipe(post)}
-                                    >
-                                        Edit
-                                    </button>
-                                    <button 
-                                        style={styles.deleteButton} 
-                                        onClick={() => handleDeleteRecipe(post.id)}
-                                    >
-                                        Delete
-                                    </button>
-                                </div>
-                            )}
-                        </div>
-                        
-                        {editingPost === post.id ? (
-                            <div style={styles.editForm}>
-                                <input
-                                    type="text"
-                                    placeholder="Recipe title"
-                                    style={styles.inputField}
-                                    value={editTitle}
-                                    onChange={(e) => setEditTitle(e.target.value)}
-                                />
-                                <input
-                                    type="text"
-                                    placeholder="Image URL"
-                                    style={styles.inputField}
-                                    value={editImage}
-                                    onChange={(e) => setEditImage(e.target.value)}
-                                />
-                                <textarea
-                                    placeholder="Recipe description"
-                                    style={styles.textarea}
-                                    value={editDescription}
-                                    onChange={(e) => setEditDescription(e.target.value)}
-                                />
-                                <div style={styles.buttonGroup}>
-                                    <button 
-                                        style={styles.updateButton} 
-                                        onClick={handleUpdateRecipe}
-                                    >
-                                        Update
-                                    </button>
-                                    <button 
-                                        style={styles.cancelButton} 
-                                        onClick={handleCancelEdit}
-                                    >
-                                        Cancel
-                                    </button>
-                                </div>
-                            </div>
-                        ) : (
-                            <>
-                                <img src={post.image} alt={post.title} style={styles.postImage} />
-                                <div style={styles.postContent}>
-                                    <h3 style={styles.postTitle}>{post.title}</h3>
-                                    <p style={styles.postDescription}>{post.description}</p>
-                                </div>
-                            </>
-                        )}
-                        
-                        <div style={styles.postActions}>
-                            <button style={styles.actionButton}>
-                                <span>👍</span> Like ({post.likes})
-                            </button>
-                            <button style={styles.actionButton}>
-                                <span>💬</span> Comment ({post.comments})
-                            </button>
-                            <button style={styles.actionButton}>
-                                <span>↗️</span> Share ({post.shares})
-                            </button>
-                        </div>
-                    </div>
-                ))}
+    @GetMapping("/user/{userId}")
+    public List<Recipe> getRecipesByUser(@PathVariable String userId) {
+        return recipeService.getRecipesByUser(userId);
+    }
 
-                {/* Explore Button */}
-                <button
-                    style={styles.exploreButton}
-                    onClick={() => navigate('/recipes')}
-                >
-                    Explore More Recipes
-                </button>
-            </div>
-        </div>
-    );
-};
+    @PutMapping("/{id}")
+    public Recipe updateRecipe(@PathVariable String id, 
+                             @Valid @RequestBody RecipeRequestDTO recipeDTO,
+                             @RequestHeader("userId") String userId) {
+        Recipe existingRecipe = recipeService.getRecipeById(id);
+        if(existingRecipe != null && existingRecipe.getUserId().equals(userId)) {
+            existingRecipe.setTitle(recipeDTO.getTitle());
+            existingRecipe.setDescription(recipeDTO.getDescription());
+            existingRecipe.setIngredients(recipeDTO.getIngredients());
+            existingRecipe.setInstructions(recipeDTO.getInstructions());
+            existingRecipe.setImageUrl(recipeDTO.getImageUrl());
+            existingRecipe.setTags(recipeDTO.getTags());
+            return recipeService.updateRecipe(existingRecipe);
+        }
+        return null; // or throw exception
+    }
 
-export default Home;
+    @DeleteMapping("/{id}")
+    public void deleteRecipe(@PathVariable String id, 
+                           @RequestHeader("userId") String userId) {
+        Recipe recipe = recipeService.getRecipeById(id);
+        if(recipe != null && recipe.getUserId().equals(userId)) {
+            recipeService.deleteRecipe(id);
+        }
+    }
+
+    @GetMapping("/search")
+    public List<Recipe> searchRecipes(@RequestParam String query) {
+        return recipeService.searchRecipes(query);
+    }
+}
