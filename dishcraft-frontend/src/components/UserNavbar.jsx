@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-import DishCraftLogo from '../image/DishCraftLogo.png'; 
+import DishCraftLogo from '../image/DishCraftLogo.png'; // ✅ Correct relative path
 
 const Navbar = ({ isLoggedIn = false }) => {
   const styles = {
@@ -69,15 +69,16 @@ const Navbar = ({ isLoggedIn = false }) => {
       </Link>
 
       <div style={styles.navLinks}>
-        
+        <Link to="/CreateRecipe" style={styles.navLink}>Recipes</Link>
+        <Link to="/groups" style={styles.navLink}>Community Groups</Link>
 
         {isLoggedIn ? (
           <>
             <Link to="/create-post" style={styles.navLink}>Create Post</Link>
             <Link to="/notifications" style={styles.navLink}>
-              <svg xmlns="http://www.w3.org/2000/svg"
-                   style={{ width: "20px", height: "20px" }}
-                   fill="none" viewBox="0 0 24 24"
+              <svg xmlns="http://www.w3.org/2000/svg" 
+                   style={{ width: "20px", height: "20px" }} 
+                   fill="none" viewBox="0 0 24 24" 
                    stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
                       d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 
@@ -99,8 +100,8 @@ const Navbar = ({ isLoggedIn = false }) => {
           </>
         ) : (
           <>
-            <Link to="/login" style={styles.navLink}>Login</Link>
-            <Link to="/register" style={styles.navLink}>Register</Link>
+            <Link to="/" style={styles.navLink}>Profile</Link>
+            
           </>
         )}
       </div>
