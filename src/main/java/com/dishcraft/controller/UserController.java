@@ -10,6 +10,8 @@ import java.util.Optional;
 import com.dishcraft.dto.UserRequestDTO;
 import jakarta.validation.Valid;
 
+import com.dishcraft.dto.UserUpdateDTO;
+import org.springframework.http.ResponseEntity;
 
 @RestController
 @RequestMapping("/api/users")
@@ -45,4 +47,35 @@ public class UserController {
     public Optional<User> getUserByEmail(@PathVariable String email) {
         return userService.getUserByEmail(email);
     }
+
+     // Get user by ID
+     @GetMapping("/{id}")
+     public ResponseEntity<User> getUserById(@PathVariable String id) {
+         return userService.getUserById(id)
+                 .map(ResponseEntity::ok)
+                 .orElse(ResponseEntity.notFound().build());
+     }
+ 
+     // Update user
+     @PutMapping("/{id}")
+     public ResponseEntity<User> updateUser(
+             @PathVariable String id,
+             @Valid @RequestBody UserUpdateDTO userUpdateDTO) {
+         
+         User user = User.builder()
+                 .username(userUpdateDTO.getUsername())
+                 .email(userUpdateDTO.getEmail())
+                 .password(userUpdateDTO.getPassword())
+                 .profileImage(userUpdateDTO.getProfileImage())
+                 .build();
+                 
+         return ResponseEntity.ok(userService.updateUser(id, user));
+     }
+ 
+     // Delete user
+     @DeleteMapping("/{id}")
+     public ResponseEntity<Void> deleteUser(@PathVariable String id) {
+         userService.deleteUser(id);
+         return ResponseEntity.noContent().build();
+     }
 }

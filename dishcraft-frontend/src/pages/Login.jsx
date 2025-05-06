@@ -236,7 +236,7 @@ const Login = () => {
                 onFocus={() => handleFocus('password')}
                 onBlur={() => handleBlur('password')}
                 required
-                minLength="8"
+                minLength="6"
               />
             </div>
 
