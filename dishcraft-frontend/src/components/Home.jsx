@@ -1,12 +1,47 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import axios from 'axios';
 
 const Home = () => {
     const navigate = useNavigate();
-    const [recipePosts, setRecipePosts] = useState([]);
-    const [loading, setLoading] = useState(true);
-    const [error, setError] = useState(null);
+
+    const [recipePosts, setRecipePosts] = useState([
+        {
+            id: 1,
+            user: 'Chef Maria',
+            avatar: 'https://randomuser.me/api/portraits/women/44.jpg',
+            time: '2 hours ago',
+            image: 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80',
+            title: 'Spicy Thai Basil Chicken',
+            likes: 124,
+            comments: 23,
+            shares: 7,
+            description: 'A delicious and authentic Thai dish with a perfect balance of spicy, sweet, and savory flavors.'
+        },
+        {
+            id: 2,
+            user: 'Chef John',
+            avatar: 'https://randomuser.me/api/portraits/men/32.jpg',
+            time: '5 hours ago',
+            image: 'https://images.unsplash.com/photo-1512621776951-a57141f2eefd?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80',
+            title: 'Fresh Veggie Salad Bowl',
+            likes: 89,
+            comments: 15,
+            shares: 4,
+            description: 'A healthy and colorful salad packed with fresh vegetables and a light vinaigrette dressing.'
+        },
+        {
+            id: 3,
+            user: 'Baking Queen',
+            avatar: 'https://randomuser.me/api/portraits/women/68.jpg',
+            time: '1 day ago',
+            image: 'https://images.unsplash.com/photo-1484723091739-30a097e8f929?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80',
+            title: 'Homemade Cinnamon Rolls',
+            likes: 215,
+            comments: 42,
+            shares: 18,
+            description: 'Soft, fluffy cinnamon rolls with cream cheese frosting - perfect for weekend brunch!'
+        }
+    ]);
 
     const [newTitle, setNewTitle] = useState('');
     const [newImage, setNewImage] = useState('');
@@ -16,87 +51,30 @@ const Home = () => {
     const [editImage, setEditImage] = useState('');
     const [editDescription, setEditDescription] = useState('');
 
-    // Fetch recipes from backend
-    useEffect(() => {
-        const fetchRecipes = async () => {
-            try {
-                const response = await axios.get('/api/recipes');
-                const formattedRecipes = response.data.map(recipe => ({
-                    id: recipe._id || recipe.id,
-                    user: recipe.userId || 'Anonymous',
-                    avatar: 'https://randomuser.me/api/portraits/lego/1.jpg',
-                    time: 'Recently',
-                    image: recipe.imageUrl,
-                    title: recipe.title,
-                    description: recipe.description,
-                    likes: 0,
-                    comments: 0,
-                    shares: 0
-                }));
-                setRecipePosts(formattedRecipes);
-                setLoading(false);
-            } catch (err) {
-                setError(err.message);
-                setLoading(false);
-                console.error('Error fetching recipes:', err);
-            }
-        };
-
-        fetchRecipes();
-    }, []);
-
-    const handleAddRecipe = async () => {
+    const handleAddRecipe = () => {
         if (!newTitle.trim() || !newImage.trim()) return;
 
-        try {
-            const response = await axios.post('/api/recipes', {
-                title: newTitle,
-                description: newDescription,
-                imageUrl: newImage,
-                ingredients: [], // Add these fields if needed
-                instructions: [], // Add these fields if needed
-                tags: [] // Add these fields if needed
-            }, {
-                headers: {
-                    'userId': 'current-user-id' // Replace with actual user ID from auth
-                }
-            });
+        const newRecipe = {
+            id: Date.now(),
+            user: 'You',
+            avatar: 'https://randomuser.me/api/portraits/lego/1.jpg',
+            time: 'Just now',
+            image: newImage,
+            title: newTitle,
+            description: newDescription,
+            likes: 0,
+            comments: 0,
+            shares: 0
+        };
 
-            const newRecipe = {
-                id: response.data._id,
-                user: 'You',
-                avatar: 'https://randomuser.me/api/portraits/lego/1.jpg',
-                time: 'Just now',
-                image: response.data.imageUrl,
-                title: response.data.title,
-                description: response.data.description,
-                likes: 0,
-                comments: 0,
-                shares: 0
-            };
-
-            setRecipePosts([newRecipe, ...recipePosts]);
-            setNewTitle('');
-            setNewImage('');
-            setNewDescription('');
-        } catch (err) {
-            console.error('Error adding recipe:', err);
-            setError('Failed to add recipe');
-        }
+        setRecipePosts([newRecipe, ...recipePosts]);
+        setNewTitle('');
+        setNewImage('');
+        setNewDescription('');
     };
 
-    const handleDeleteRecipe = async (id) => {
-        try {
-            await axios.delete(`/api/recipes/${id}`, {
-                headers: {
-                    'userId': 'current-user-id' // Replace with actual user ID from auth
-                }
-            });
-            setRecipePosts(recipePosts.filter(post => post.id !== id));
-        } catch (err) {
-            console.error('Error deleting recipe:', err);
-            setError('Failed to delete recipe');
-        }
+    const handleDeleteRecipe = (id) => {
+        setRecipePosts(recipePosts.filter(post => post.id !== id));
     };
 
     const handleEditRecipe = (post) => {
@@ -106,43 +84,25 @@ const Home = () => {
         setEditDescription(post.description);
     };
 
-    const handleUpdateRecipe = async () => {
+    const handleUpdateRecipe = () => {
         if (!editTitle.trim() || !editImage.trim()) return;
 
-        try {
-            const response = await axios.put(`/api/recipes/${editingPost}`, {
-                title: editTitle,
-                description: editDescription,
-                imageUrl: editImage,
-                ingredients: [], // Add these fields if needed
-                instructions: [], // Add these fields if needed
-                tags: [] // Add these fields if needed
-            }, {
-                headers: {
-                    'userId': 'current-user-id' // Replace with actual user ID from auth
-                }
-            });
+        setRecipePosts(recipePosts.map(post => 
+            post.id === editingPost 
+                ? { 
+                    ...post, 
+                    title: editTitle, 
+                    image: editImage, 
+                    description: editDescription,
+                    time: 'Just now (edited)'
+                } 
+                : post
+        ));
 
-            setRecipePosts(recipePosts.map(post => 
-                post.id === editingPost 
-                    ? { 
-                        ...post, 
-                        title: response.data.title, 
-                        image: response.data.imageUrl, 
-                        description: response.data.description,
-                        time: 'Recently (edited)'
-                    } 
-                    : post
-            ));
-
-            setEditingPost(null);
-            setEditTitle('');
-            setEditImage('');
-            setEditDescription('');
-        } catch (err) {
-            console.error('Error updating recipe:', err);
-            setError('Failed to update recipe');
-        }
+        setEditingPost(null);
+        setEditTitle('');
+        setEditImage('');
+        setEditDescription('');
     };
 
     const handleCancelEdit = () => {
@@ -409,45 +369,13 @@ const Home = () => {
         userActions: {
             display: 'flex',
             gap: '10px'
-        },
-        loading: {
-            textAlign: 'center',
-            padding: '20px',
-            color: '#fff',
-            fontSize: '18px'
-        },
-        error: {
-            textAlign: 'center',
-            padding: '20px',
-            color: '#ff6b6b',
-            backgroundColor: 'rgba(255, 255, 255, 0.8)',
-            borderRadius: '8px',
-            marginBottom: '20px'
         }
     };
-
-    if (loading) {
-        return (
-            <div style={styles.container}>
-                <div style={styles.loading}>Loading recipes...</div>
-            </div>
-        );
-    }
-
-    if (error) {
-        return (
-            <div style={styles.container}>
-                <div style={styles.error}>Error: {error}</div>
-            </div>
-        );
-    }
 
     return (
         <div style={styles.container}>
             <div style={styles.mainContent}>
-                {error && <div style={styles.error}>{error}</div>}
-
-                {/* Add New Recipe Section */}
+                {/* 🔥 Add New Recipe Section */}
                 <div style={styles.createPost}>
                     <h3 style={styles.formTitle}>Add New Recipe</h3>
                     <input
@@ -475,7 +403,7 @@ const Home = () => {
                     </button>
                 </div>
 
-                {/* Recipe Feed */}
+                {/* 🧑‍🍳 Recipe Feed */}
                 {recipePosts.map(post => (
                     <div key={post.id} style={styles.recipePost}>
                         <div style={styles.postHeader}>
@@ -563,7 +491,7 @@ const Home = () => {
                     </div>
                 ))}
 
-                {/* Explore Button */}
+                {/* 🌍 Explore Button */}
                 <button
                     style={styles.exploreButton}
                     onClick={() => navigate('/recipes')}

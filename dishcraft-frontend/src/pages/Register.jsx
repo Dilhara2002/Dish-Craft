@@ -45,7 +45,7 @@ const Register = () => {
       marginTop: "4px"
     },
     formContainer: {
-      padding: "32px"
+      padding: "50px"
     },
     formGroup: {
       marginBottom: "24px"
