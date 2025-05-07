@@ -4,6 +4,7 @@ import { BrowserRouter as Router, Routes, Route, useLocation } from 'react-route
 import Login from './pages/Login';
 import Register from './pages/Register';
 import Home from './components/Home';
+import Profile from './pages/Profile';
 
 import Navbar from './components/Navbar';          // For Login & Register pages
 import UserNavbar from './components/UserNavbar';  // For Home page
@@ -31,6 +32,7 @@ function AppContent() {
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
         <Route path="/home" element={<Home />} />
+        <Route path="/profile" element={<Profile />} />
         {/* Add more routes if needed */}
       </Routes>
     </div>

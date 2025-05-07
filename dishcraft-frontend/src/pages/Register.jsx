@@ -1,220 +1,142 @@
-import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
-import axios from "../api/axios";
+// src/pages/Register.jsx
+import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 
 const Register = () => {
   const navigate = useNavigate();
   const [formData, setFormData] = useState({
-    username: "",
-    email: "",
-    password: "",
+    name: '',
+    email: '',
+    password: '',
+    confirmPassword: '',
   });
 
-  // Inline styles
-  const styles = {
-    container: {
-      minHeight: "100vh",
-      background: "linear-gradient(to bottom right, #fff7ed, #fef3c7)",
-      display: "flex",
-      alignItems: "center",
-      justifyContent: "center",
-      padding: "16px"
-    },
-    card: {
-      width: "100%",
-      maxWidth: "448px",
-      backgroundColor: "#ffffff",
-      borderRadius: "12px",
-      boxShadow: "0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05)",
-      overflow: "hidden"
-    },
-    header: {
-      backgroundColor: "#f59e0b",
-      padding: "16px 24px"
-    },
-    headerTitle: {
-      fontSize: "24px",
-      fontWeight: "700",
-      color: "#ffffff",
-      textAlign: "center"
-    },
-    headerSubtitle: {
-      color: "#fef3c7",
-      fontSize: "14px",
-      textAlign: "center",
-      marginTop: "4px"
-    },
-    formContainer: {
-      padding: "50px"
-    },
-    formGroup: {
-      marginBottom: "24px"
-    },
-    label: {
-      display: "block",
-      fontSize: "14px",
-      fontWeight: "500",
-      color: "#374151",
-      marginBottom: "4px"
-    },
-    input: {
-      marginTop: "4px",
-      display: "block",
-      width: "100%",
-      padding: "8px 16px",
-      border: "1px solid #d1d5db",
-      borderRadius: "8px",
-      outline: "none",
-      transition: "border-color 0.2s ease-in-out",
-      marginBottom: "16px"
-    },
-    button: {
-      width: "100%",
-      backgroundColor: "#f59e0b",
-      color: "#ffffff",
-      padding: "12px 16px",
-      borderRadius: "8px",
-      border: "none",
-      cursor: "pointer",
-      transition: "background-color 0.2s ease-in-out",
-      fontWeight: "500",
-      fontSize: "16px"
-    },
-    loginText: {
-      marginTop: "24px",
-      textAlign: "center",
-      fontSize: "14px",
-      color: "#4b5563"
-    },
-    loginLink: {
-      color: "#d97706",
-      fontWeight: "500",
-      textDecoration: "none",
-      cursor: "pointer"
-    }
-  };
+  const [isFocused, setIsFocused] = useState({
+    name: false,
+    email: false,
+    password: false,
+    confirmPassword: false,
+  });
 
   const handleChange = (e) => {
+    const { name, value } = e.target;
     setFormData((prev) => ({
       ...prev,
-      [e.target.name]: e.target.value,
+      [name]: value,
     }));
   };
 
-  const handleSubmit = async (e) => {
+  const handleFocus = (field) => {
+    setIsFocused((prev) => ({ ...prev, [field]: true }));
+  };
+
+  const handleBlur = (field) => {
+    setIsFocused((prev) => ({ ...prev, [field]: false }));
+  };
+
+  const handleSubmit = (e) => {
     e.preventDefault();
-    try {
-      await axios.post("/api/users", formData);
-      alert("Registration successful!");
-      navigate("/login");
-    } catch (err) {
-      console.error(err);
-      alert("Registration failed.");
+    if (formData.password !== formData.confirmPassword) {
+      alert("Passwords do not match");
+      return;
     }
+    console.log('Registering user:', formData);
+    navigate('/Home');
   };
 
-  // Handle focus events for input styling
-  const handleFocus = (e) => {
-    e.target.style.borderColor = "#f59e0b";
-    e.target.style.boxShadow = "0 0 0 2px rgba(245, 158, 11, 0.2)";
-  };
-
-  const handleBlur = (e) => {
-    e.target.style.borderColor = "#d1d5db";
-    e.target.style.boxShadow = "none";
-  };
-
-  // Handle navigation to login page
-  const goToLogin = () => {
-    navigate("/login");
-  };
+  const styles = {
+     // (same styles object from your login page)
+  }
 
   return (
     <div style={styles.container}>
       <div style={styles.card}>
-        {/* Header with food-themed accent */}
-        <div style={styles.header}>
-          <h1 style={styles.headerTitle}>Join Dish Craft</h1>
-          <p style={styles.headerSubtitle}>Create your culinary account</p>
-        </div>
+        <header style={styles.header}>
+          <h1 style={styles.headerTitle}>Create an Account</h1>
+          <p style={styles.headerSubtitle}>Join Dish Craft today</p>
+        </header>
 
-        {/* Registration Form */}
         <div style={styles.formContainer}>
           <form onSubmit={handleSubmit}>
             <div style={styles.formGroup}>
-              <label htmlFor="username" style={styles.label}>
-                Username
-              </label>
+              <label htmlFor="name" style={styles.label}>Name</label>
               <input
                 type="text"
-                id="username"
-                name="username"
-                style={styles.input}
-                placeholder="Your username"
-                value={formData.username}
+                id="name"
+                name="name"
+                value={formData.name}
                 onChange={handleChange}
-                onFocus={handleFocus}
-                onBlur={handleBlur}
+                onFocus={() => handleFocus('name')}
+                onBlur={() => handleBlur('name')}
+                style={{
+                  ...styles.input,
+                  ...(isFocused.name && styles.inputFocus),
+                }}
                 required
               />
             </div>
 
             <div style={styles.formGroup}>
-              <label htmlFor="email" style={styles.label}>
-                Email
-              </label>
+              <label htmlFor="email" style={styles.label}>Email</label>
               <input
                 type="email"
                 id="email"
                 name="email"
-                style={styles.input}
-                placeholder="your@email.com"
                 value={formData.email}
                 onChange={handleChange}
-                onFocus={handleFocus}
-                onBlur={handleBlur}
+                onFocus={() => handleFocus('email')}
+                onBlur={() => handleBlur('email')}
+                style={{
+                  ...styles.input,
+                  ...(isFocused.email && styles.inputFocus),
+                }}
                 required
               />
             </div>
 
             <div style={styles.formGroup}>
-              <label htmlFor="password" style={styles.label}>
-                Password
-              </label>
+              <label htmlFor="password" style={styles.label}>Password</label>
               <input
                 type="password"
                 id="password"
                 name="password"
-                style={styles.input}
-                placeholder="••••••••"
                 value={formData.password}
                 onChange={handleChange}
-                onFocus={handleFocus}
-                onBlur={handleBlur}
+                onFocus={() => handleFocus('password')}
+                onBlur={() => handleBlur('password')}
+                style={{
+                  ...styles.input,
+                  ...(isFocused.password && styles.inputFocus),
+                }}
+                required
+                minLength={6}
+              />
+            </div>
+
+            <div style={styles.formGroup}>
+              <label htmlFor="confirmPassword" style={styles.label}>Confirm Password</label>
+              <input
+                type="password"
+                id="confirmPassword"
+                name="confirmPassword"
+                value={formData.confirmPassword}
+                onChange={handleChange}
+                onFocus={() => handleFocus('confirmPassword')}
+                onBlur={() => handleBlur('confirmPassword')}
+                style={{
+                  ...styles.input,
+                  ...(isFocused.confirmPassword && styles.inputFocus),
+                }}
                 required
               />
             </div>
 
-            <button
-              type="submit"
-              style={styles.button}
-              onMouseOver={(e) => e.target.style.backgroundColor = "#d97706"}
-              onMouseOut={(e) => e.target.style.backgroundColor = "#f59e0b"}
-            >
-              Create Account
-            </button>
+            <button type="submit" style={styles.button}>Register</button>
           </form>
 
-          <p style={styles.loginText}>
+          <p style={styles.signupText}>
             Already have an account?{' '}
-            <span
-              style={styles.loginLink}
-              onClick={goToLogin}
-              onMouseOver={(e) => e.target.style.textDecoration = "underline"}
-              onMouseOut={(e) => e.target.style.textDecoration = "none"}
-            >
-              Sign in
-            </span>
+            <a href="/login" style={styles.link}>Sign in</a>
           </p>
         </div>
       </div>
