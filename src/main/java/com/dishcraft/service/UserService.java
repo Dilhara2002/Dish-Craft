@@ -1,5 +1,6 @@
 package com.dishcraft.service;
 
+import com.dishcraft.dto.UserResponseDTO;
 import com.dishcraft.model.User;
 
 import java.util.List;
@@ -13,6 +14,8 @@ public interface UserService {
     User updateUser(String id, User user);
     void deleteUser(String id);
     Optional<User> getUserById(String id);
+    UserResponseDTO getUserInfoByEmail(String email);
+
 
      // Admin-specific methods
      List<User> findAllUsers();

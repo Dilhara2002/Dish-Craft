@@ -1,9 +1,10 @@
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route, useLocation } from 'react-router-dom';
 
-import Login from './pages/Login';
-import Register from './pages/Register';
+import Login from './pages/Login.js';
+import Register from './pages/Register.js';
 import Home from './components/Home';
+import Profile from './pages/Profile.js'; // Uncomment if you have a Profile page
 
 import Navbar from './components/Navbar';          // For Login & Register pages
 import UserNavbar from './components/UserNavbar';  // For Home page
@@ -31,6 +32,7 @@ function AppContent() {
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
         <Route path="/home" element={<Home />} />
+        <Route path="/profile" element={<Profile />} /> {/* Uncomment if you have a Profile page */}
         {/* Add more routes if needed */}
       </Routes>
     </div>

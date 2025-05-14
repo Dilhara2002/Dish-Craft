@@ -8,10 +8,16 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 import java.util.Optional;
 import com.dishcraft.dto.UserRequestDTO;
+import com.dishcraft.dto.UserResponseDTO;
+
 import jakarta.validation.Valid;
 
 import com.dishcraft.dto.UserUpdateDTO;
+
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.UserDetails;
 
 @RestController
 @RequestMapping("/api/users")
@@ -78,4 +84,15 @@ public class UserController {
          userService.deleteUser(id);
          return ResponseEntity.noContent().build();
      }
+
+        // Get user info by email
+         @GetMapping("/me")
+    public ResponseEntity<UserResponseDTO> getCurrentUser(@AuthenticationPrincipal UserDetails userDetails) {
+        if (userDetails == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+
+        UserResponseDTO user = userService.getUserInfoByEmail(userDetails.getUsername()); // getEmail = username
+        return ResponseEntity.ok(user);
+    }
 }

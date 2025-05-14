@@ -5,6 +5,8 @@ import com.dishcraft.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.security.crypto.password.PasswordEncoder;
+
+import com.dishcraft.dto.UserResponseDTO;
 import com.dishcraft.model.Role;
 
 import java.util.List;
@@ -98,6 +100,15 @@ public UserServiceImpl(UserRepository userRepository, PasswordEncoder passwordEn
     public List<User> searchUsers(String keyword) {
         return userRepository.findByUsernameContainingOrEmailContaining(keyword, keyword);
     }
+
+    @Override
+public UserResponseDTO getUserInfoByEmail(String email) {
+    User user = userRepository.findByEmail(email)
+            .orElseThrow(() -> new RuntimeException("User not found"));
+
+    return new UserResponseDTO(user.getUsername(), user.getEmail(), user.getRoles());
+}
+
    
 }
 
