@@ -4,7 +4,7 @@ import { BrowserRouter as Router, Routes, Route, useLocation } from 'react-route
 import Login from './pages/Login.js';
 import Register from './pages/Register.js';
 import Home from './components/Home';
-import Profile from './pages/Profile.js'; // Uncomment if you have a Profile page
+import Profile from './pages/Profile'; // Uncomment if you have a Profile page
 
 import Navbar from './components/Navbar';          // For Login & Register pages
 import UserNavbar from './components/UserNavbar';  // For Home page

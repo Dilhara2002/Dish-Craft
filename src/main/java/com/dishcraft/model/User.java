@@ -24,6 +24,8 @@ public class User implements UserDetails {
     private String email;
     private String password;
     private String profileImage;
+    private String firstName;
+    private String lastName;
 
     @Builder.Default
     private Set<String> roles = new HashSet<>();
@@ -49,7 +51,7 @@ public class User implements UserDetails {
 
     @Override
     public String getUsername() {
-        return email; // Using email as username for authentication
+        return email;
     }
 
     @Override

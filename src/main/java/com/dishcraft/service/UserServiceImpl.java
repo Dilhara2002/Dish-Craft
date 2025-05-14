@@ -5,150 +5,176 @@ import com.dishcraft.dto.UserUpdateDTO;
 import com.dishcraft.model.User;
 import com.dishcraft.model.Role;
 import com.dishcraft.repository.UserRepository;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
 
+@Slf4j
 @Service
+@RequiredArgsConstructor
 public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
 
-    @Autowired
-    public UserServiceImpl(UserRepository userRepository, PasswordEncoder passwordEncoder) {
-        this.userRepository = userRepository;
-        this.passwordEncoder = passwordEncoder;
-    }
-
     @Override
+    @Transactional
     public User createUser(User user) {
+        log.info("Creating new user with email: {}", user.getEmail());
         user.setPassword(passwordEncoder.encode(user.getPassword()));
-        return userRepository.save(user);
+        User savedUser = userRepository.save(user);
+        log.info("Created user with ID: {}", savedUser.getId());
+        return savedUser;
     }
 
     @Override
     public Optional<User> getUserByEmail(String email) {
+        log.debug("Fetching user by email: {}", email);
         return userRepository.findByEmail(email);
     }
 
     @Override
     public List<User> getAllUsers() {
+        log.debug("Fetching all users");
         return userRepository.findAll();
     }
 
     @Override
     public Optional<User> getUserById(String id) {
+        log.debug("Fetching user by ID: {}", id);
         return userRepository.findById(id);
     }
 
     @Override
-    public User updateUser(String id, User userDetails) {
+    @Transactional
+    public User updateUserFields(String id, UserUpdateDTO userDTO) {
+        log.info("Updating user with ID: {}", id);
         User existingUser = userRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("User not found with id: " + id));
+                .orElseThrow(() -> {
+                    log.error("User not found with ID: {}", id);
+                    return new RuntimeException("User not found with ID: " + id);
+                });
 
-        // Update fields if they're not null
-        if (userDetails.getUsername() != null) {
-            existingUser.setUsername(userDetails.getUsername());
-        }
-        if (userDetails.getEmail() != null) {
-            existingUser.setEmail(userDetails.getEmail());
-        }
-        if (userDetails.getPassword() != null) {
-            existingUser.setPassword(passwordEncoder.encode(userDetails.getPassword()));
-        }
-        if (userDetails.getProfileImage() != null) {
-            existingUser.setProfileImage(userDetails.getProfileImage());
+        if (userDTO.getUsername() != null && !userDTO.getUsername().equals(existingUser.getUsername())) {
+            log.info("Updating username from {} to {}", existingUser.getUsername(), userDTO.getUsername());
+            existingUser.setUsername(userDTO.getUsername());
         }
 
-        return userRepository.save(existingUser);
+        if (userDTO.getFirstName() != null && !userDTO.getFirstName().equals(existingUser.getFirstName())) {
+            log.info("Updating firstName from {} to {}", existingUser.getFirstName(), userDTO.getFirstName());
+            existingUser.setFirstName(userDTO.getFirstName());
+        }
+
+        if (userDTO.getLastName() != null && !userDTO.getLastName().equals(existingUser.getLastName())) {
+            log.info("Updating lastName from {} to {}", existingUser.getLastName(), userDTO.getLastName());
+            existingUser.setLastName(userDTO.getLastName());
+        }
+
+        if (userDTO.getEmail() != null && !userDTO.getEmail().equals(existingUser.getEmail())) {
+            log.info("Updating email from {} to {}", existingUser.getEmail(), userDTO.getEmail());
+            existingUser.setEmail(userDTO.getEmail());
+        }
+
+        if (userDTO.getPassword() != null) {
+            log.info("Updating password");
+            existingUser.setPassword(passwordEncoder.encode(userDTO.getPassword()));
+        }
+
+        if (userDTO.getProfileImage() != null && !userDTO.getProfileImage().equals(existingUser.getProfileImage())) {
+            log.info("Updating profileImage from {} to {}", existingUser.getProfileImage(), userDTO.getProfileImage());
+            existingUser.setProfileImage(userDTO.getProfileImage());
+        }
+
+        User updatedUser = userRepository.save(existingUser);
+        log.info("Successfully updated user with ID: {}", id);
+        return updatedUser;
     }
 
     @Override
+    @Transactional
     public void deleteUser(String id) {
+        log.info("Deleting user with ID: {}", id);
         if (!userRepository.existsById(id)) {
-            throw new RuntimeException("User not found with id: " + id);
+            log.error("User not found with ID: {}", id);
+            throw new RuntimeException("User not found with ID: " + id);
         }
         userRepository.deleteById(id);
-    }
-
-    @Override
-    public List<User> findAllUsers() {
-        return userRepository.findAll();
-    }
-
-    @Override
-    public User promoteToAdmin(String id) {
-        User user = userRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("User not found with id: " + id));
-        user.addRole(Role.ADMIN);
-        return userRepository.save(user);
-    }
-
-    @Override
-    public User demoteFromAdmin(String id) {
-        User user = userRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("User not found with id: " + id));
-        user.removeRole(Role.ADMIN);
-        return userRepository.save(user);
-    }
-
-    @Override
-    public List<User> searchUsers(String keyword) {
-        return userRepository.findByUsernameContainingOrEmailContaining(keyword, keyword);
+        log.info("Successfully deleted user with ID: {}", id);
     }
 
     @Override
     public UserResponseDTO getUserInfoByEmail(String email) {
+        log.debug("Fetching user info by email: {}", email);
         User user = userRepository.findByEmail(email)
-                .orElseThrow(() -> new RuntimeException("User not found"));
+                .orElseThrow(() -> {
+                    log.error("User not found with email: {}", email);
+                    return new RuntimeException("User not found with email: " + email);
+                });
 
-        return new UserResponseDTO(user.getUsername(), user.getEmail(), user.getRoles());
+        return UserResponseDTO.builder()
+                .username(user.getUsername())
+                .firstName(user.getFirstName())
+                .lastName(user.getLastName())
+                .email(user.getEmail())
+                .profileImage(user.getProfileImage())
+                .roles(user.getRoles())
+                .build();
     }
 
     @Override
-    public User updateUserFields(String id, UserUpdateDTO userDTO) {
-        // Find the user by ID
-        User existingUser = userRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("User not found with id: " + id));
+    public List<User> findAllUsers() {
+        log.debug("Fetching all users (admin)");
+        return userRepository.findAll();
+    }
 
-        // Debugging output before updating
-        System.out.println("Before update: " + existingUser);
-        System.out.println("Update fields: " + userDTO);
-
-        // Update username if it is different from the current value
-        if (userDTO.getUsername() != null && !userDTO.getUsername().equals(existingUser.getUsername())) {
-            existingUser.setUsername(userDTO.getUsername());
-            System.out.println("Updated Username to: " + userDTO.getUsername());
+    @Override
+    @Transactional
+    public User promoteToAdmin(String id) {
+        log.info("Promoting user to admin with ID: {}", id);
+        User user = userRepository.findById(id)
+                .orElseThrow(() -> {
+                    log.error("User not found with ID: {}", id);
+                    return new RuntimeException("User not found with ID: " + id);
+                });
+        
+        if (!user.hasRole(Role.ADMIN)) {
+            user.addRole(Role.ADMIN);
+            User updatedUser = userRepository.save(user);
+            log.info("Successfully promoted user to admin with ID: {}", id);
+            return updatedUser;
         }
+        log.warn("User already has admin role with ID: {}", id);
+        return user;
+    }
 
-        // Update email if it is different from the current value
-        if (userDTO.getEmail() != null && !userDTO.getEmail().equals(existingUser.getEmail())) {
-            existingUser.setEmail(userDTO.getEmail());
-            System.out.println("Updated Email to: " + userDTO.getEmail());
+    @Override
+    @Transactional
+    public User demoteFromAdmin(String id) {
+        log.info("Demoting user from admin with ID: {}", id);
+        User user = userRepository.findById(id)
+                .orElseThrow(() -> {
+                    log.error("User not found with ID: {}", id);
+                    return new RuntimeException("User not found with ID: " + id);
+                });
+        
+        if (user.hasRole(Role.ADMIN)) {
+            user.removeRole(Role.ADMIN);
+            User updatedUser = userRepository.save(user);
+            log.info("Successfully demoted user from admin with ID: {}", id);
+            return updatedUser;
         }
+        log.warn("User doesn't have admin role with ID: {}", id);
+        return user;
+    }
 
-        // Update password if it is different from the current value
-        if (userDTO.getPassword() != null && !userDTO.getPassword().equals(existingUser.getPassword())) {
-            existingUser.setPassword(passwordEncoder.encode(userDTO.getPassword()));
-            System.out.println("Updated Password.");
-        }
-
-        // Update profile image if it is different from the current value
-        if (userDTO.getProfileImage() != null && !userDTO.getProfileImage().equals(existingUser.getProfileImage())) {
-            existingUser.setProfileImage(userDTO.getProfileImage());
-            System.out.println("Updated Profile Image to: " + userDTO.getProfileImage());
-        }
-
-        // Save the updated user
-        User updatedUser = userRepository.save(existingUser);
-
-        // Debugging output after updating
-        System.out.println("After update: " + updatedUser);
-
-        return updatedUser;
+    @Override
+    public List<User> searchUsers(String keyword) {
+        log.debug("Searching users with keyword: {}", keyword);
+        return userRepository.findByUsernameContainingOrEmailContaining(keyword, keyword);
     }
 }

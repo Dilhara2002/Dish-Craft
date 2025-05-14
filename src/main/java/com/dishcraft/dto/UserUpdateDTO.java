@@ -1,10 +1,7 @@
 package com.dishcraft.dto;
 
 import jakarta.validation.constraints.Email;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
+import lombok.*;
 
 @Data
 @Builder
@@ -12,6 +9,8 @@ import lombok.Builder;
 @AllArgsConstructor
 public class UserUpdateDTO {
     private String username;
+    private String firstName;
+    private String lastName;
     
     @Email(message = "Invalid email format")
     private String email;
