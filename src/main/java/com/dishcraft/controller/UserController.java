@@ -56,11 +56,12 @@ public class UserController {
 
      // Get user by ID
      @GetMapping("/{id}")
-     public ResponseEntity<User> getUserById(@PathVariable String id) {
-         return userService.getUserById(id)
-                 .map(ResponseEntity::ok)
-                 .orElse(ResponseEntity.notFound().build());
-     }
+public ResponseEntity<User> getUserById(@PathVariable String id) {
+    return userService.getUserById(id)
+            .map(ResponseEntity::ok)
+            .orElse(ResponseEntity.notFound().build());
+}
+
  
      // Update user
      @PutMapping("/{id}")
@@ -75,7 +76,7 @@ public class UserController {
                  .profileImage(userUpdateDTO.getProfileImage())
                  .build();
                  
-         return ResponseEntity.ok(userService.updateUser(id, user));
+         return ResponseEntity.ok(userService.updateUserFields(id, userUpdateDTO));
      }
  
      // Delete user

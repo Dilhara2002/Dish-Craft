@@ -1,13 +1,13 @@
 package com.dishcraft.service;
 
+import com.dishcraft.dto.UserResponseDTO;
+import com.dishcraft.dto.UserUpdateDTO;
 import com.dishcraft.model.User;
+import com.dishcraft.model.Role;
 import com.dishcraft.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
 import org.springframework.security.crypto.password.PasswordEncoder;
-
-import com.dishcraft.dto.UserResponseDTO;
-import com.dishcraft.model.Role;
+import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
@@ -15,14 +15,14 @@ import java.util.Optional;
 @Service
 public class UserServiceImpl implements UserService {
 
-    private final UserRepository userRepository; 
+    private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
 
     @Autowired
-public UserServiceImpl(UserRepository userRepository, PasswordEncoder passwordEncoder) {
-    this.userRepository = userRepository;
-    this.passwordEncoder = passwordEncoder;
-}
+    public UserServiceImpl(UserRepository userRepository, PasswordEncoder passwordEncoder) {
+        this.userRepository = userRepository;
+        this.passwordEncoder = passwordEncoder;
+    }
 
     @Override
     public User createUser(User user) {
@@ -49,7 +49,7 @@ public UserServiceImpl(UserRepository userRepository, PasswordEncoder passwordEn
     public User updateUser(String id, User userDetails) {
         User existingUser = userRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("User not found with id: " + id));
-        
+
         // Update fields if they're not null
         if (userDetails.getUsername() != null) {
             existingUser.setUsername(userDetails.getUsername());
@@ -63,7 +63,7 @@ public UserServiceImpl(UserRepository userRepository, PasswordEncoder passwordEn
         if (userDetails.getProfileImage() != null) {
             existingUser.setProfileImage(userDetails.getProfileImage());
         }
-        
+
         return userRepository.save(existingUser);
     }
 
@@ -102,13 +102,53 @@ public UserServiceImpl(UserRepository userRepository, PasswordEncoder passwordEn
     }
 
     @Override
-public UserResponseDTO getUserInfoByEmail(String email) {
-    User user = userRepository.findByEmail(email)
-            .orElseThrow(() -> new RuntimeException("User not found"));
+    public UserResponseDTO getUserInfoByEmail(String email) {
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("User not found"));
 
-    return new UserResponseDTO(user.getUsername(), user.getEmail(), user.getRoles());
+        return new UserResponseDTO(user.getUsername(), user.getEmail(), user.getRoles());
+    }
+
+    @Override
+    public User updateUserFields(String id, UserUpdateDTO userDTO) {
+        // Find the user by ID
+        User existingUser = userRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("User not found with id: " + id));
+
+        // Debugging output before updating
+        System.out.println("Before update: " + existingUser);
+        System.out.println("Update fields: " + userDTO);
+
+        // Update username if it is different from the current value
+        if (userDTO.getUsername() != null && !userDTO.getUsername().equals(existingUser.getUsername())) {
+            existingUser.setUsername(userDTO.getUsername());
+            System.out.println("Updated Username to: " + userDTO.getUsername());
+        }
+
+        // Update email if it is different from the current value
+        if (userDTO.getEmail() != null && !userDTO.getEmail().equals(existingUser.getEmail())) {
+            existingUser.setEmail(userDTO.getEmail());
+            System.out.println("Updated Email to: " + userDTO.getEmail());
+        }
+
+        // Update password if it is different from the current value
+        if (userDTO.getPassword() != null && !userDTO.getPassword().equals(existingUser.getPassword())) {
+            existingUser.setPassword(passwordEncoder.encode(userDTO.getPassword()));
+            System.out.println("Updated Password.");
+        }
+
+        // Update profile image if it is different from the current value
+        if (userDTO.getProfileImage() != null && !userDTO.getProfileImage().equals(existingUser.getProfileImage())) {
+            existingUser.setProfileImage(userDTO.getProfileImage());
+            System.out.println("Updated Profile Image to: " + userDTO.getProfileImage());
+        }
+
+        // Save the updated user
+        User updatedUser = userRepository.save(existingUser);
+
+        // Debugging output after updating
+        System.out.println("After update: " + updatedUser);
+
+        return updatedUser;
+    }
 }
-
-   
-}
-
