@@ -1,73 +1,226 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
+import { UserCircle, LogOut, Camera, Edit3, Save } from 'lucide-react';
 
 const Profile = () => {
   const [profile, setProfile] = useState(null);
   const [edit, setEdit] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [imagePreview, setImagePreview] = useState(null);
   const token = localStorage.getItem('token');
-  const userId = localStorage.getItem('userId'); // save this after login
-
+  const userId = localStorage.getItem('userId');
   
   useEffect(() => {
     const fetchProfile = async () => {
       try {
+        setLoading(true);
         const res = await axios.get(`http://localhost:8080/api/users/${userId}`, {
           headers: { Authorization: `Bearer ${token}` },
         });
         setProfile(res.data);
+        if (res.data.profileImage) {
+          setImagePreview(res.data.profileImage);
+        }
       } catch (err) {
-        alert('Failed to load profile');
+        console.error('Failed to load profile:', err);
+      } finally {
+        setLoading(false);
       }
     };
-    fetchProfile();
+    
+    if (userId && token) {
+      fetchProfile();
+    }
   }, [userId, token]);
 
   const handleChange = (e) => {
     setProfile({ ...profile, [e.target.name]: e.target.value });
   };
 
-  const handleUpdate = async (e) => {
-    e.preventDefault();
-    try {
-      const res = await axios.put(`http://localhost:8080/api/users/${userId}`, profile, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      alert('Profile updated');
-      setProfile(res.data);
-      setEdit(false);
-    } catch (err) {
-      alert('Update failed');
+  const handleImageChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      setImagePreview(URL.createObjectURL(file));
+      
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setProfile({ ...profile, profileImage: reader.result });
+      };
+      reader.readAsDataURL(file);
     }
   };
 
-  if (!profile) return <p>Loading...</p>;
+  const handleUpdate = async (e) => {
+    e.preventDefault();
+    try {
+      setLoading(true);
+      const res = await axios.put(`http://localhost:8080/api/users/${userId}`, profile, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      setProfile(res.data);
+      setEdit(false);
+      alert('Profile updated successfully!'); // Simple alert instead of toast
+    } catch (err) {
+      console.error('Update failed:', err);
+      alert('Failed to update profile. Please try again.'); // Simple alert instead of toast
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleLogout = () => {
+    localStorage.removeItem('token');
+    localStorage.removeItem('userId');
+    window.location.href = '/login';
+  };
+
+  if (loading && !profile) {
+    return (
+      <div className="d-flex justify-content-center align-items-center" style={{ height: '100vh' }}>
+        <div className="spinner-border text-primary" role="status">
+          <span className="visually-hidden">Loading...</span>
+        </div>
+      </div>
+    );
+  }
 
   return (
-    <div style={{ maxWidth: '500px', margin: '30px auto', padding: '20px', border: '1px solid #ddd', borderRadius: '8px' }}>
-      <h2 style={{ textAlign: 'center' }}>User Profile</h2>
-      {edit ? (
-        <form onSubmit={handleUpdate}>
-          <input name="firstName" value={profile.firstName} onChange={handleChange} placeholder="First Name" style={inputStyle} />
-          <input name="lastName" value={profile.lastName} onChange={handleChange} placeholder="Last Name" style={inputStyle} />
-          <input name="profileImage" value={profile.profileImage || ''} onChange={handleChange} placeholder="Profile Image URL" style={inputStyle} />
-          <button type="submit" style={saveBtn}>Save</button>
-        </form>
-      ) : (
-        <div>
-          <p><strong>Username:</strong> {profile.username}</p>
-          <p><strong>Email:</strong> {profile.email}</p>
-          <p><strong>First Name:</strong> {profile.firstName}</p>
-          <p><strong>Last Name:</strong> {profile.lastName}</p>
-          {profile.profileImage && <img src={profile.profileImage} alt="Profile" style={{ maxWidth: '100px' }} />}
-          <button onClick={() => setEdit(true)} style={editBtn}>Edit</button>
+    <div className="container py-5">
+      <div className="row">
+        <div className="col-lg-4 mx-auto">
+          <div className="card shadow">
+            <div className="bg-primary text-white p-5 text-center rounded-top position-relative">
+              <button 
+                onClick={handleLogout} 
+                className="btn btn-light btn-sm position-absolute top-0 end-0 m-3"
+                title="Logout"
+              >
+                <LogOut className="me-1" size={16} /> Logout
+              </button>
+              
+              <div className="position-relative d-inline-block mb-3">
+                <div className="avatar-upload position-relative">
+                  <div className="avatar-preview rounded-circle border border-4 border-white overflow-hidden" style={{ width: '150px', height: '150px' }}>
+                    {imagePreview ? (
+                      <img 
+                        src={imagePreview} 
+                        alt="Profile" 
+                        className="w-100 h-100 object-fit-cover"
+                      />
+                    ) : (
+                      <div className="d-flex justify-content-center align-items-center bg-secondary w-100 h-100">
+                        <UserCircle size={80} />
+                      </div>
+                    )}
+                  </div>
+                  
+                  {edit && (
+                    <div className="avatar-edit position-absolute bottom-0 end-0">
+                      <label 
+                        htmlFor="imageUpload" 
+                        className="btn btn-sm btn-light rounded-circle p-2"
+                        title="Change profile picture"
+                      >
+                        <Camera size={16} />
+                      </label>
+                      <input 
+                        id="imageUpload" 
+                        type="file" 
+                        accept="image/*" 
+                        onChange={handleImageChange} 
+                        className="d-none"
+                      />
+                    </div>
+                  )}
+                </div>
+              </div>
+              
+              <h3 className="mb-0">
+                {profile?.firstName} {profile?.lastName}
+              </h3>
+              <p className="text-light mb-0">@{profile?.username}</p>
+            </div>
+            
+            <div className="card-body p-4">
+              {!edit ? (
+                <>
+                  <div className="d-flex justify-content-between align-items-center mb-3">
+                    <h5 className="card-title">Profile Information</h5>
+                    <button 
+                      onClick={() => setEdit(true)} 
+                      className="btn btn-outline-primary btn-sm"
+                    >
+                      <Edit3 size={16} className="me-1" /> Edit Profile
+                    </button>
+                  </div>
+                  
+                  <div className="mb-3">
+                    <p className="mb-1"><strong>Username:</strong></p>
+                    <p className="text-muted">{profile?.username}</p>
+                  </div>
+                  
+                  <div className="mb-3">
+                    <p className="mb-1"><strong>First Name:</strong></p>
+                    <p className="text-muted">{profile?.firstName}</p>
+                  </div>
+                  
+                  <div className="mb-3">
+                    <p className="mb-1"><strong>Last Name:</strong></p>
+                    <p className="text-muted">{profile?.lastName}</p>
+                  </div>
+                </>
+              ) : (
+                <form onSubmit={handleUpdate}>
+                  <div className="mb-3">
+                    <label htmlFor="firstName" className="form-label">First Name</label>
+                    <input 
+                      type="text" 
+                      className="form-control" 
+                      id="firstName" 
+                      name="firstName" 
+                      value={profile?.firstName || ''} 
+                      onChange={handleChange} 
+                    />
+                  </div>
+                  
+                  <div className="mb-3">
+                    <label htmlFor="lastName" className="form-label">Last Name</label>
+                    <input 
+                      type="text" 
+                      className="form-control" 
+                      id="lastName" 
+                      name="lastName" 
+                      value={profile?.lastName || ''} 
+                      onChange={handleChange} 
+                    />
+                  </div>
+                  
+                  <div className="d-grid gap-2">
+                    <button type="submit" className="btn btn-success">
+                      <Save size={16} className="me-1" /> Save Changes
+                    </button>
+                    <button 
+                      type="button" 
+                      className="btn btn-outline-secondary" 
+                      onClick={() => {
+                        setEdit(false);
+                        setImagePreview(profile?.profileImage || null);
+                      }}
+                    >
+                      Cancel
+                    </button>
+                  </div>
+                </form>
+              )}
+            </div>
+            
+            
+            
+          </div>
         </div>
-      )}
+      </div>
     </div>
   );
 };
-
-const inputStyle = { width: '100%', padding: '8px', margin: '8px 0' };
-const editBtn = { padding: '10px', marginTop: '10px', background: '#007bff', color: '#fff', border: 'none', borderRadius: '4px' };
-const saveBtn = { ...editBtn, background: '#28a745' };
 
 export default Profile;

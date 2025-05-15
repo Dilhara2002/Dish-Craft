@@ -100,8 +100,8 @@ const Navbar = ({ isLoggedIn = false }) => {
           </>
         ) : (
           <>
-            <Link to="/login" style={styles.navLink}>Login</Link>
-            <Link to="/register" style={styles.navLink}>Register</Link>
+            <Link to="/profile" style={styles.navLink}>Profile</Link>
+            {/* <Link to="/register" style={styles.navLink}>Register</Link> */}
           </>
         )}
       </div>

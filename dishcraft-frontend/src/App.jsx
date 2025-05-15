@@ -10,6 +10,7 @@ import Navbar from './components/Navbar';          // For Login & Register pages
 import UserNavbar from './components/UserNavbar';  // For Home page
 import AdminNavbar from './components/AdminNavbar';
 
+import AdminDashboard from './pages/AdminDashboard.js';
 
 // Uncomment if you have a RecipeDetail page
 
@@ -45,6 +46,8 @@ function AppContent() {
         <Route path="/add" element={<AddRecipe />} />
        
         <Route path="/recipes/:id" element={<RecipeDetails />} />
+
+        <Route path="/admin" element={<AdminDashboard />} />
         
         {/* Add more routes as needed */}
         {/* Add more routes if needed */}
