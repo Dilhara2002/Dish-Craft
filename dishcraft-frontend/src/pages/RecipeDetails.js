@@ -13,6 +13,7 @@ const RecipeDetails = () => {
     axios.get(`http://localhost:8080/api/recipes/${id}`, {
       headers: {
         Authorization: `Bearer ${token}`
+      
       }
     })
       .then(res => {

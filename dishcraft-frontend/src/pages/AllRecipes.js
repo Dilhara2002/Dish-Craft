@@ -26,7 +26,7 @@ const AllRecipes = () => {
         {recipes.length === 0 && <p>No recipes found.</p>}
 
         {recipes.map((recipe, index) => (
-          <div key={recipe._id || index} className="col-md-4 mb-3">
+          <div key={recipe.id || index} className="col-md-4 mb-3">
             <div className="card h-100">
               {recipe.imageUrl && (
                 <img
@@ -39,7 +39,7 @@ const AllRecipes = () => {
               <div className="card-body">
                 <h5 className="card-title">{recipe.title}</h5>
                 <p className="card-text">{recipe.description?.substring(0, 100)}...</p>
-                <Link to={`/recipes/${recipe._id}`} className="btn btn-sm btn-outline-primary">
+                <Link to={`/recipes/${recipe.id}`} className="btn btn-sm btn-outline-primary">
                   View Details
                 </Link>
               </div>

@@ -22,20 +22,29 @@ public class RecipeController {
         this.recipeService = recipeService;
     }
 
-    @PostMapping
-    public Recipe createRecipe(@Valid @RequestBody RecipeRequestDTO recipeDTO, 
-                             @RequestHeader("userId") String userId) {
-        Recipe recipe = Recipe.builder()
-                .title(recipeDTO.getTitle())
-                .description(recipeDTO.getDescription())
-                .ingredients(recipeDTO.getIngredients())
-                .instructions(recipeDTO.getInstructions())
-                .imageUrl(recipeDTO.getImageUrl())
-                .tags(recipeDTO.getTags())
-                .userId(userId)
-                .build();
-        return recipeService.createRecipe(recipe);
+   @PostMapping
+public ResponseEntity<?> createRecipe(@Valid @RequestBody RecipeRequestDTO recipeDTO,
+                                      @RequestHeader(value = "userid", required = false) String userId) {
+    // Check if userId is missing
+    if (userId == null || userId.trim().isEmpty()) {
+        return ResponseEntity
+                .badRequest()
+                .body("Missing required header: Userid");
     }
+
+    Recipe recipe = Recipe.builder()
+            .title(recipeDTO.getTitle())
+            .description(recipeDTO.getDescription())
+            .ingredients(recipeDTO.getIngredients())
+            .instructions(recipeDTO.getInstructions())
+            .imageUrl(recipeDTO.getImageUrl())
+            .tags(recipeDTO.getTags())
+            .userId(userId)
+            .build();
+
+    return ResponseEntity.ok(recipeService.createRecipe(recipe));
+}
+
 
     @GetMapping
     public List<Recipe> getAllRecipes() {

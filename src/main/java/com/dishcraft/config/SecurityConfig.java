@@ -36,7 +36,7 @@ public class SecurityConfig {
             .authorizeHttpRequests()
             .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll() // Allow preflight requests
             .requestMatchers("/api/auth/**").permitAll()
-            .requestMatchers("/api/recipes/**").authenticated()
+            .requestMatchers("/api/recipes/**").permitAll()
             .requestMatchers("/api/users/me").authenticated()
             .anyRequest().authenticated()
             .and()
@@ -50,9 +50,9 @@ public class SecurityConfig {
     @Bean
 public CorsConfigurationSource corsConfigurationSource() {
     CorsConfiguration configuration = new CorsConfiguration();
-    configuration.setAllowedOrigins(List.of("http://localhost:3000"));
+    configuration.setAllowedOrigins(List.of("http://localhost:3000", "http://localhost"));
     configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
-    configuration.setAllowedHeaders(Arrays.asList("Authorization", "Content-Type", "X-Requested-With"));
+    configuration.setAllowedHeaders(Arrays.asList("Authorization", "Content-Type", "X-Requested-With","userId" ));
     configuration.setExposedHeaders(List.of("Authorization")); // Optional: expose token to frontend
     configuration.setAllowCredentials(true);
 

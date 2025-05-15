@@ -23,21 +23,23 @@ const AddRecipe = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     const token = localStorage.getItem('token');
+try {
+  const payload = {
+    title: form.title,
+    description: form.description,
+    ingredients: form.ingredients.split(',').map(i => i.trim()),
+    instructions: form.steps.split('.').map(s => s.trim()).filter(s => s),
+    imageUrl: form.imageUrl,
+    tags: form.tags ? form.tags.split(',').map(t => t.trim()) : [] // only if tags are used in DTO
+  };
 
-    try {
-      const payload = {
-        title: form.title,
-        description: form.description,
-        ingredients: form.ingredients.split(',').map(i => i.trim()),
-        steps: form.steps.split('.').map(s => s.trim()).filter(s => s),
-        imageUrl: form.imageUrl
-      };
-
-      await axios.post('http://localhost:8080/api/recipes', payload, {
-        headers: {
-          Authorization: `Bearer ${token}`
-        }
-      });
+  await axios.post('http://localhost:8080/api/recipes', payload, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+      userid: localStorage.getItem('userId'), // Don't use string template unnecessarily
+      host: window.location.origin
+    }
+  });
 
       alert('Recipe added successfully!');
       navigate('/my-recipes');
