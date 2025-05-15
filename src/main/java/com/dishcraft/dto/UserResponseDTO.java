@@ -8,6 +8,7 @@ import java.util.Set;
 @NoArgsConstructor
 @AllArgsConstructor
 public class UserResponseDTO {
+     private String id;
     private String username;
     private String firstName;
     private String lastName;

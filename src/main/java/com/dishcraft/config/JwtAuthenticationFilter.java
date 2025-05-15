@@ -1,5 +1,6 @@
 package com.dishcraft.config;
 
+import com.dishcraft.model.Role; 
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
