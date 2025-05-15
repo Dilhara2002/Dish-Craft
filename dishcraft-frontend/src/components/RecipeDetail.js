@@ -32,7 +32,7 @@ const RecipeDetail = () => {
       await axios.delete(`http://localhost:8080/api/recipes/${id}`, {
         headers: {
           Authorization: `Bearer ${token}`,
-          userId: userId
+          userId: userId,
         }
       });
       window.location.href = '/recipes';
