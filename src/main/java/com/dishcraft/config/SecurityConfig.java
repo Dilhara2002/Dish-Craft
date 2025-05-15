@@ -36,6 +36,7 @@ public class SecurityConfig {
             .authorizeHttpRequests()
             .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll() // Allow preflight requests
             .requestMatchers("/api/auth/**").permitAll()
+            .requestMatchers("/api/recipes/**").authenticated()
             .requestMatchers("/api/users/me").authenticated()
             .anyRequest().authenticated()
             .and()

@@ -9,10 +9,13 @@ import Profile from './pages/Profile'; // Uncomment if you have a Profile page
 import Navbar from './components/Navbar';          // For Login & Register pages
 import UserNavbar from './components/UserNavbar';  // For Home page
 import AdminNavbar from './components/AdminNavbar';
-import RecipeList from './pages/RecipeList.js'; // Uncomment if you have a RecipeList page
-import RecipeForm from './components/RecipeForm.js'; // Uncomment if you have a RecipeForm page
-import RecipeDetail from './components/RecipeDetail.js'; // Uncomment if you have a RecipeDetail page
 
+
+// Uncomment if you have a RecipeDetail page
+
+import RecipeDetails from './pages/RecipeDetails.js';
+import AllRecipes from './pages/AllRecipes.js'; // Uncomment if you have an AllRecipes page
+import AddRecipe from './pages/AddRecipe.js';
 
 // Handles routing + navbar logic
 function AppContent() {
@@ -37,9 +40,13 @@ function AppContent() {
         <Route path="/register" element={<Register />} />
         <Route path="/home" element={<Home />} />
         <Route path="/profile" element={<Profile />} /> {/* Uncomment if you have a Profile page */}
-        <Route path="/recipes" element={<RecipeList />} /> {/* Uncomment if you have a RecipeList page */}
-        <Route path="/recipes/new" element={<RecipeForm />} /> {/* Uncomment if you have a RecipeForm page */}
-        <Route path="/recipes/:id" element={<RecipeForm />} /> {/* Uncomment if you have a RecipeForm page */}
+
+        <Route path="/recipes" element={<AllRecipes />} /> {/* Uncomment if you have a RecipeList page */}
+        <Route path="/add" element={<AddRecipe />} />
+       
+        <Route path="/recipes/:id" element={<RecipeDetails />} />
+        
+        {/* Add more routes as needed */}
         {/* Add more routes if needed */}
       </Routes>
     </div>
