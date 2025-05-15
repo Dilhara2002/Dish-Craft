@@ -1,14 +1,17 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
-import { UserCircle, LogOut, Camera, Edit3, Save } from 'lucide-react';
+import { UserCircle, LogOut, Camera, Edit3, Save, Settings } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 
 const Profile = () => {
   const [profile, setProfile] = useState(null);
   const [edit, setEdit] = useState(false);
   const [loading, setLoading] = useState(true);
   const [imagePreview, setImagePreview] = useState(null);
+  const [isAdmin, setIsAdmin] = useState(false);
   const token = localStorage.getItem('token');
   const userId = localStorage.getItem('userId');
+  const navigate = useNavigate();
   
   useEffect(() => {
     const fetchProfile = async () => {
@@ -18,6 +21,12 @@ const Profile = () => {
           headers: { Authorization: `Bearer ${token}` },
         });
         setProfile(res.data);
+        
+        // Check if user has admin role
+        if (res.data.roles && res.data.roles.includes('ADMIN')) {
+          setIsAdmin(true);
+        }
+        
         if (res.data.profileImage) {
           setImagePreview(res.data.profileImage);
         }
@@ -59,10 +68,10 @@ const Profile = () => {
       });
       setProfile(res.data);
       setEdit(false);
-      alert('Profile updated successfully!'); // Simple alert instead of toast
+      alert('Profile updated successfully!');
     } catch (err) {
       console.error('Update failed:', err);
-      alert('Failed to update profile. Please try again.'); // Simple alert instead of toast
+      alert('Failed to update profile. Please try again.');
     } finally {
       setLoading(false);
     }
@@ -72,6 +81,10 @@ const Profile = () => {
     localStorage.removeItem('token');
     localStorage.removeItem('userId');
     window.location.href = '/login';
+  };
+
+  const navigateToAdminPanel = () => {
+    navigate('/admin');
   };
 
   if (loading && !profile) {
@@ -90,13 +103,24 @@ const Profile = () => {
         <div className="col-lg-4 mx-auto">
           <div className="card shadow">
             <div className="bg-primary text-white p-5 text-center rounded-top position-relative">
-              <button 
-                onClick={handleLogout} 
-                className="btn btn-light btn-sm position-absolute top-0 end-0 m-3"
-                title="Logout"
-              >
-                <LogOut className="me-1" size={16} /> Logout
-              </button>
+              <div className="position-absolute top-0 end-0 m-3 d-flex gap-2">
+                {isAdmin && (
+                  <button 
+                    onClick={navigateToAdminPanel}
+                    className="btn btn-light btn-sm"
+                    title="Admin Panel"
+                  >
+                    <Settings className="me-1" size={16} /> Admin
+                  </button>
+                )}
+                <button 
+                  onClick={handleLogout} 
+                  className="btn btn-light btn-sm"
+                  title="Logout"
+                >
+                  <LogOut className="me-1" size={16} /> Logout
+                </button>
+              </div>
               
               <div className="position-relative d-inline-block mb-3">
                 <div className="avatar-upload position-relative">
@@ -168,6 +192,11 @@ const Profile = () => {
                     <p className="mb-1"><strong>Last Name:</strong></p>
                     <p className="text-muted">{profile?.lastName}</p>
                   </div>
+                  
+                  <div className="mb-3">
+                    <p className="mb-1"><strong>Roles:</strong></p>
+                    <p className="text-muted">{profile?.roles?.join(', ') || 'User'}</p>
+                  </div>
                 </>
               ) : (
                 <form onSubmit={handleUpdate}>
@@ -213,9 +242,6 @@ const Profile = () => {
                 </form>
               )}
             </div>
-            
-            
-            
           </div>
         </div>
       </div>
