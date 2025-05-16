@@ -52,7 +52,7 @@ const RecipeDetails = () => {
         ))}
       </ol>
 
-      <Link to="/" className="btn btn-secondary mt-3">Back to All Recipes</Link>
+      <Link to="/recipes" className="btn btn-secondary mt-3">Back to All Recipes</Link>
     </div>
   );
 };
