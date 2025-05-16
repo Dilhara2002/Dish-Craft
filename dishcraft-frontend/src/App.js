@@ -1,13 +1,22 @@
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route, useLocation } from 'react-router-dom';
 
-import Login from './pages/Login';
-import Register from './pages/Register';
+import Login from './pages/Login.js';
+import Register from './pages/Register.js';
 import Home from './components/Home';
+import Profile from './pages/Profile'; // Uncomment if you have a Profile page
 
 import Navbar from './components/Navbar';          // For Login & Register pages
 import UserNavbar from './components/UserNavbar';  // For Home page
 import AdminNavbar from './components/AdminNavbar';
+
+import AdminDashboard from './pages/AdminDashboard.js';
+
+// Uncomment if you have a RecipeDetail page
+
+import RecipeDetails from './pages/RecipeDetails.js';
+import AllRecipes from './pages/AllRecipes.js'; // Uncomment if you have an AllRecipes page
+import AddRecipe from './pages/AddRecipe.js';
 
 // Handles routing + navbar logic
 function AppContent() {
@@ -31,6 +40,16 @@ function AppContent() {
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
         <Route path="/home" element={<Home />} />
+        <Route path="/profile" element={<Profile />} /> {/* Uncomment if you have a Profile page */}
+
+        <Route path="/recipes" element={<AllRecipes />} /> {/* Uncomment if you have a RecipeList page */}
+        <Route path="/add" element={<AddRecipe />} />
+       
+        <Route path="/recipes/:id" element={<RecipeDetails />} />
+
+        <Route path="/admin" element={<AdminDashboard />} />
+        
+        {/* Add more routes as needed */}
         {/* Add more routes if needed */}
       </Routes>
     </div>

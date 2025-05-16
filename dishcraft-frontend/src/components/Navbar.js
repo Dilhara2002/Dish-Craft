@@ -1,5 +1,5 @@
+import React from 'react';
 import { Link } from 'react-router-dom';
-import DishCraftLogo from '../image/DishCraftLogo.png'; 
 
 const Navbar = ({ isLoggedIn = false }) => {
   const styles = {
@@ -60,46 +60,29 @@ const Navbar = ({ isLoggedIn = false }) => {
   return (
     <nav style={styles.navbar}>
       <Link to="/" style={styles.brandLink}>
-        <img 
-          src={DishCraftLogo} 
-          alt="Dish Craft Logo" 
-          style={styles.logoImage} 
-        />
-        Dish Craft
+        {/* Update the image import path as needed */}
+        <img src="/path/to/DishCraftLogo.png" alt="DishCraft Logo" style={styles.logoImage} />
+        <span>Dish Craft</span>
       </Link>
-
+      
       <div style={styles.navLinks}>
+        <Link to="/all-recipes" style={styles.navLink}>Recipes</Link>
         
-
         {isLoggedIn ? (
           <>
-            <Link to="/create-post" style={styles.navLink}>Create Post</Link>
-            <Link to="/notifications" style={styles.navLink}>
-              <svg xmlns="http://www.w3.org/2000/svg"
-                   style={{ width: "20px", height: "20px" }}
-                   fill="none" viewBox="0 0 24 24"
-                   stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
-                      d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 
-                         14.158V11a6.002 6.002 0 00-4-5.659V5a2 
-                         2 0 10-4 0v.341C7.67 6.165 6 8.388 6 
-                         11v3.159c0 .538-.214 1.055-.595 
-                         1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
-              </svg>
-            </Link>
+            <Link to="/add-recipe" style={styles.navLink}>Create Post</Link>
             <div style={styles.profileSection}>
-              <Link to="/profile" style={styles.navLink}>
-                <img 
-                  src="https://via.placeholder.com/150" 
-                  alt="Profile" 
-                  style={styles.profileImage}
-                />
-              </Link>
+              <Link to="/profile" style={styles.navLink}>Profile</Link>
+              <img 
+                src="/path/to/default-profile.png" 
+                alt="User Profile" 
+                style={styles.profileImage} 
+              />
             </div>
           </>
         ) : (
           <>
-            <Link to="/login" style={styles.navLink}>Login</Link>
+            <Link to="/login" style={styles.navLink}>Logins</Link>
             <Link to="/register" style={styles.navLink}>Register</Link>
           </>
         )}

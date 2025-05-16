@@ -1,4 +1,3 @@
-// src/main/java/com/dishcraft/repository/UserRepository.java
 package com.dishcraft.repository;
 
 import com.dishcraft.model.User;
@@ -12,5 +11,5 @@ public interface UserRepository extends MongoRepository<User, String> {
     Optional<User> findByUsername(String username);
     boolean existsByEmail(String email);
     boolean existsByUsername(String username);
-     List<User> findByUsernameContainingOrEmailContaining(String username, String email);
+    List<User> findByUsernameContainingOrEmailContaining(String username, String email);
 }
