@@ -69,7 +69,7 @@ const Navbar = ({ isLoggedIn = false }) => {
       </Link>
 
       <div style={styles.navLinks}>
-        <Link to="/CreateRecipe" style={styles.navLink}>Recipes</Link>
+        <Link to="/recipes" style={styles.navLink}>Recipes</Link>
         <Link to="/groups" style={styles.navLink}>Community Groups</Link>
 
         {isLoggedIn ? (

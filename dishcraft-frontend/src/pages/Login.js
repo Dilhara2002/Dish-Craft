@@ -200,7 +200,7 @@ const Login = () => {
       {/* Toast notification */}
       <div className="position-fixed bottom-0 end-0 p-3" style={{ zIndex: 11 }}>
         <div 
-          className={toast ${showToast ? 'show' : 'hide'} text-white bg-${toastType}} 
+          className={`toast ${showToast ? 'show' : 'hide'} text-white bg-${toastType}`} 
           role="alert" 
           aria-live="assertive" 
           aria-atomic="true"

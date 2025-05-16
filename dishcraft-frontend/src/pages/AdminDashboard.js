@@ -9,93 +9,93 @@ const AdminDashboard = () => {
 
   // Fetch all users
   const fetchUsers = async () => {
-    try {
-      setLoading(true);
-      const token = localStorage.getItem('token');
-      const response = await axios.get('http://localhost:8080/api/admin/users', {
-        headers: { Authorization: `Bearer ${token}` }
-      });
-      setUsers(response.data);
-      setError(null);
-    } catch (err) {
-      setError('Failed to fetch users');
-      console.error('Error fetching users:', err);
-    } finally {
-      setLoading(false);
-    }
-  };
+      try {
+        setLoading(true);
+        const token = localStorage.getItem('token');
+        const response = await axios.get('http://localhost:8080/api/admin/users', {
+          headers: { Authorization: `Bearer ${token}` }
+        });
+        setUsers(response.data);
+        setError(null);
+      } catch (err) {
+        setError('Failed to fetch users');
+        console.error('Error fetching users:', err);
+      } finally {
+        setLoading(false);
+      }
+    };
 
   // Search users
   const handleSearch = async () => {
-    if (!searchTerm.trim()) {
-      fetchUsers();
-      return;
-    }
-    
-    try {
-      setLoading(true);
-      const token = localStorage.getItem('token');
-      const response = await axios.get(`http://localhost:8080/api/admin/users/search?keyword=${searchTerm}`, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
-      setUsers(response.data);
-      setError(null);
-    } catch (err) {
-      setError('Failed to search users');
-      console.error('Error searching users:', err);
-    } finally {
-      setLoading(false);
-    }
-  };
+      if (!searchTerm.trim()) {
+        fetchUsers();
+        return;
+      }
+      
+      try {
+        setLoading(true);
+        const token = localStorage.getItem('token');
+        const response = await axios.get(`http://localhost:8080/api/admin/users/search?keyword=${searchTerm}`, {
+          headers: { Authorization: `Bearer ${token}` }
+        });
+        setUsers(response.data);
+        setError(null);
+      } catch (err) {
+        setError('Failed to search users');
+        console.error('Error searching users:', err);
+      } finally {
+        setLoading(false);
+      }
+    };
 
   // Promote user to admin
   const promoteUser = async (userId) => {
-    try {
-      const token = localStorage.getItem('token');
-      await axios.post(
-        `http://localhost:8080/api/admin/users/${userId}/promote`, 
-        null, 
-        { headers: { Authorization: `Bearer ${token}` } }
-      );
-      fetchUsers(); // Refresh the list
-    } catch (err) {
-      setError('Failed to promote user');
-      console.error('Error promoting user:', err);
-    }
-  };
+      try {
+        const token = localStorage.getItem('token');
+        await axios.post(
+          `http://localhost:8080/api/admin/users/${userId}/promote`, 
+          null, 
+          { headers: { Authorization: `Bearer ${token}` } }
+        );
+        fetchUsers(); // Refresh the list
+      } catch (err) {
+        setError('Failed to promote user');
+        console.error('Error promoting user:', err);
+      }
+    };
 
   // Demote admin to user
   const demoteUser = async (userId) => {
-    try {
-      const token = localStorage.getItem('token');
-      await axios.post(
-        `http://localhost:8080/api/admin/users/${userId}/demote`, 
-        null, 
-        { headers: { Authorization: `Bearer ${token}` } }
-      );
-      fetchUsers(); // Refresh the list
-    } catch (err) {
-      setError('Failed to demote user');
-      console.error('Error demoting user:', err);
-    }
-  };
+      try {
+        const token = localStorage.getItem('token');
+        await axios.post(
+          `http://localhost:8080/api/admin/users/${userId}/demote`, 
+          null, 
+          { headers: { Authorization: `Bearer ${token}` } }
+        );
+        fetchUsers(); // Refresh the list
+      } catch (err) {
+        setError('Failed to demote user');
+        console.error('Error demoting user:', err);
+      }
+    };
 
   // Delete user
   const deleteUser = async (userId) => {
-    if (!window.confirm('Are you sure you want to delete this user?')) return;
-    
-    try {
-      const token = localStorage.getItem('token');
-      await axios.delete(
-        `http://localhost:8080/api/admin/users/${userId}`, 
-        { headers: { Authorization: `Bearer ${token}` } }
-      );
-      fetchUsers(); // Refresh the list
-    } catch (err) {
-      setError('Failed to delete user');
-      console.error('Error deleting user:', err);
-    }
-  };
+      if (!window.confirm('Are you sure you want to delete this user?')) return;
+      
+      try {
+        const token = localStorage.getItem('token');
+        await axios.delete(
+          `http://localhost:8080/api/admin/users/${userId}`, 
+          { headers: { Authorization: `Bearer ${token}` } }
+        );
+        fetchUsers(); // Refresh the list
+      } catch (err) {
+        setError('Failed to delete user');
+        console.error('Error deleting user:', err);
+      }
+    };
 
   // Initial data load
   useEffect(() => {

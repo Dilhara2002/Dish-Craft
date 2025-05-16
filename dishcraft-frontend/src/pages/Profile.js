@@ -143,7 +143,7 @@ const Profile = () => {
 
               {/* 👇 Show Admin Dashboard link only for admins */}
               {isAdmin && (
-                <Link to="/admin-dashboard" className="btn btn-warning mt-3">
+                <Link to="/admin" className="btn btn-warning mt-3">
                   Go to Admin Dashboard
                 </Link>
               )}
