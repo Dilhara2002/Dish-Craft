@@ -16,6 +16,7 @@ public class Comment {
     private String id;
     private String recipeId;   // Which recipe this comment belongs to
     private String userId;     // Who commented
+    private String username;
     private String text;       // Comment text
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
