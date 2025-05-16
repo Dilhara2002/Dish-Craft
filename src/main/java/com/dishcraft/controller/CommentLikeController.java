@@ -8,7 +8,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import com.dishcraft.dto.CommentDTO;
 
 import java.util.List;
 
@@ -25,12 +24,19 @@ public class CommentLikeController {
         this.likeService = likeService;
     }
 
-    // Comments
+    // // Comments
+
+    // @PostMapping("/comments/{recipeId}")
+    // public Comment addComment(@PathVariable String recipeId,
+    // @RequestHeader("userId") String userId,
+    // @RequestParam String text) {
+    // return commentService.addComment(recipeId, userId, text);
+    // }
 
     @PostMapping("/comments/{recipeId}")
     public ResponseEntity<Comment> addComment(@PathVariable String recipeId,
-                                              @RequestHeader("userId") String userId,
-                                              @RequestParam String text) {
+            @RequestHeader("userId") String userId,
+            @RequestParam String text) {
         Comment comment = commentService.addComment(recipeId, userId, text);
         if (comment != null) {
             return ResponseEntity.ok(comment);
@@ -41,19 +47,19 @@ public class CommentLikeController {
 
     @PutMapping("/comments/{commentId}")
     public Comment updateComment(@PathVariable String commentId,
-                                 @RequestHeader("userId") String userId,
-                                 @RequestParam String text) {
+            @RequestHeader("userId") String userId,
+            @RequestParam String text) {
         return commentService.updateComment(commentId, userId, text);
     }
 
     @DeleteMapping("/comments/{commentId}")
     public void deleteComment(@PathVariable String commentId,
-                              @RequestHeader("userId") String userId) {
+            @RequestHeader("userId") String userId) {
         commentService.deleteComment(commentId, userId);
     }
 
     @GetMapping("/comments/recipe/{recipeId}")
-    public List<CommentDTO> getComments(@PathVariable String recipeId) {
+    public List<Comment> getComments(@PathVariable String recipeId) {
         return commentService.getCommentsByRecipe(recipeId);
     }
 
@@ -61,13 +67,13 @@ public class CommentLikeController {
 
     @PostMapping("/likes/{recipeId}")
     public String likeRecipe(@PathVariable String recipeId,
-                             @RequestHeader("userId") String userId) {
+            @RequestHeader("userId") String userId) {
         return likeService.likeRecipe(recipeId, userId);
     }
 
     @DeleteMapping("/likes/{recipeId}")
     public String unlikeRecipe(@PathVariable String recipeId,
-                               @RequestHeader("userId") String userId) {
+            @RequestHeader("userId") String userId) {
         return likeService.unlikeRecipe(recipeId, userId);
     }
 
@@ -76,3 +82,4 @@ public class CommentLikeController {
         return likeService.getLikesByRecipe(recipeId);
     }
 }
+

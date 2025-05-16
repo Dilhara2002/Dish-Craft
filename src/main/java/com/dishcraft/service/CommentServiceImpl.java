@@ -1,27 +1,21 @@
 package com.dishcraft.service;
 
 import com.dishcraft.model.Comment;
-import com.dishcraft.model.User;
 import com.dishcraft.repository.CommentRepository;
-import com.dishcraft.dto.CommentDTO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 @Service
 public class CommentServiceImpl implements CommentService {
 
     private final CommentRepository commentRepository;
-    private final UserService userService;  // Inject UserService to fetch user info
 
     @Autowired
-    public CommentServiceImpl(CommentRepository commentRepository, UserService userService) {
+    public CommentServiceImpl(CommentRepository commentRepository) {
         this.commentRepository = commentRepository;
-        this.userService = userService;
     }
 
     @Override
@@ -62,12 +56,7 @@ public class CommentServiceImpl implements CommentService {
     }
 
     @Override
-    public List<CommentDTO> getCommentsByRecipe(String recipeId) {
-        List<Comment> comments = commentRepository.findByRecipeId(recipeId);
-        return comments.stream().map(comment -> {
-            User user = userService.findById(comment.getUserId());
-            String username = (user != null) ? user.getUsername() : "Unknown";
-            return new CommentDTO(comment.getId(), comment.getText(), username, comment.getUserId());
-        }).collect(Collectors.toList());
+    public List<Comment> getCommentsByRecipe(String recipeId) {
+        return commentRepository.findByRecipeId(recipeId);
     }
 }
