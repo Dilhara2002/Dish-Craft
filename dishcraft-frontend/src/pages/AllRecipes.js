@@ -1,10 +1,14 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import { Link } from 'react-router-dom';
-import { FaHeart, FaRegHeart, FaComment, FaEdit, FaTrash, FaCheck, FaTimes } from 'react-icons/fa';
+import { 
+  FaHeart, FaRegHeart, FaComment, FaEdit, 
+  FaTrash, FaCheck, FaTimes, FaPlus 
+} from 'react-icons/fa';
 import moment from 'moment';
+import 'bootstrap/dist/css/bootstrap.min.css';
 
-const MyRecipes = () => {
+const AllRecipes = () => {
   const [recipes, setRecipes] = useState([]);
   const [comments, setComments] = useState({});
   const [likes, setLikes] = useState({});
@@ -184,509 +188,198 @@ const MyRecipes = () => {
 
   if (loading) {
     return (
-      <div className="loading-container">
-        Loading recipes...
+      <div className="d-flex justify-content-center align-items-center vh-100">
+        <div className="spinner-border text-primary" role="status">
+          <span className="visually-hidden">Loading...</span>
+        </div>
       </div>
     );
   }
 
   return (
-    <div className="my-recipes-container">
-      <div className="header-section">
-        <h2></h2>
-        <Link to="/add" className="add-recipe-button">
-          Add New Recipe
-        </Link>
-      </div>
-
-      {recipes.length === 0 && (
-        <div className="empty-state">
-          <p>No recipes found. Create your first recipe!</p>
+    <div className="bg-light min-vh-100 py-4">
+      <div className="container">
+        {/* Instagram-like header with sticky top */}
+        <div className="sticky-top bg-white border-bottom shadow-sm mb-4">
+          <div className="container d-flex justify-content-between align-items-center py-3">
+            <h2 className="h4 mb-0 fw-bold text-primary">FoodGram</h2>
+            <Link 
+              to="/add" 
+              className="btn btn-primary rounded-circle p-2"
+              title="Add New Recipe"
+            >
+              <FaPlus />
+            </Link>
+          </div>
         </div>
-      )}
 
-      <div className="recipes-grid">
-        {recipes.map((recipe) => (
-          <div key={recipe.id} className="recipe-card">
-            <div className="recipe-content">
+        {recipes.length === 0 && (
+          <div className="card text-center p-5 mb-4">
+            <div className="card-body">
+              <h5 className="card-title">No recipes found</h5>
+              <p className="card-text text-muted">Create your first recipe!</p>
+              <Link to="/add" className="btn btn-primary">
+                Add New Recipe
+              </Link>
+            </div>
+          </div>
+        )}
+
+        {/* Instagram-like feed with individual cards */}
+        <div className="d-flex flex-column align-items-center">
+          {recipes.map((recipe) => (
+            <div key={recipe.id} className="card mb-4 border-0 shadow-sm" style={{ maxWidth: "600px", width: "100%" }}>
+              {/* Card header with user info */}
+              <div className="card-header bg-white d-flex align-items-center p-3 border-0">
+                <div className="rounded-circle bg-secondary text-white d-flex align-items-center justify-content-center me-2" style={{ width: "40px", height: "40px" }}>
+                  {recipe.username?.charAt(0).toUpperCase() || "U"}
+                </div>
+                <div>
+                  <h6 className="mb-0 fw-bold">{recipe.username || "User"}</h6>
+                </div>
+              </div>
+              
+              {/* Image container */}
               {recipe.imageUrl && (
-                <div className="recipe-image-container">
+                <div className="position-relative" style={{ paddingBottom: "100%", overflow: "hidden" }}>
                   <img
                     src={recipe.imageUrl}
                     alt={recipe.title}
-                    className="recipe-image"
+                    className="position-absolute top-0 start-0 w-100 h-100 object-fit-cover"
                   />
                 </div>
               )}
               
-              <div className={`recipe-details ${recipe.imageUrl ? 'with-image' : 'full-width'}`}>
-                <h3 className="recipe-title">{recipe.title}</h3>
-                
-                <p className="recipe-description">
-                  {recipe.description?.substring(0, 150)}...
-                </p>
-
-                <div className="like-section">
+              {/* Action buttons */}
+              <div className="card-body p-3 pt-2">
+                <div className="d-flex gap-3 mb-2">
                   <button 
                     onClick={() => handleLike(recipe.id)} 
-                    className="like-button"
+                    className="btn btn-link p-0 border-0"
                   >
                     {likes[recipe.id]?.isLiked ? (
-                      <FaHeart className="liked-icon" />
+                      <FaHeart className="fs-4 text-danger" />
                     ) : (
-                      <FaRegHeart className="not-liked-icon" />
+                      <FaRegHeart className="fs-4" />
                     )}
                   </button>
-                  <span className="like-count">
-                    {likes[recipe.id]?.count || 0} likes
-                  </span>
+                  <Link to={`/recipes/${recipe.id}`} className="btn btn-link p-0 border-0">
+                    <FaComment className="fs-4" />
+                  </Link>
                 </div>
-
-                <div className="comments-section">
-                  <div className="comments-header">
-                    <FaComment className="comment-icon" />
-                    <span>Comments ({comments[recipe.id]?.length || 0})</span>
-                  </div>
-                  
-                  <div className="comments-list">
-                    {comments[recipe.id]?.length > 0 ? (
-                      comments[recipe.id].map(comment => (
-                        <div key={comment.id} className="comment-item">
-                          <div className="comment-header">
-                            <strong>{comment.username}</strong>
-                            <small>{comment.createdAt}</small>
-                          </div>
-
-                          {editingComment.id === comment.id ? (
-                            <>
-                              <input
-                                type="text"
-                                className="comment-edit-input"
-                                value={editingComment.text}
-                                onChange={(e) => setEditingComment({ ...editingComment, text: e.target.value })}
-                              />
-                              <div className="comment-edit-actions">
-                                <button 
-                                  className="save-edit-button"
-                                  onClick={() => handleUpdateComment(recipe.id, comment.id)}
-                                >
-                                  <FaCheck size={12} /> Save
-                                </button>
-                                <button 
-                                  className="cancel-edit-button"
-                                  onClick={cancelEditing}
-                                >
-                                  <FaTimes size={12} /> Cancel
-                                </button>
-                              </div>
-                            </>
-                          ) : (
-                            <>
-                              <p className="comment-text">{comment.text}</p>
-                              {comment.userId === userId && (
-                                <div className="comment-actions">
+                
+                {/* Likes count */}
+                <div className="mb-1">
+                  <p className="fw-bold mb-0">{likes[recipe.id]?.count || 0} likes</p>
+                </div>
+                
+                {/* Recipe title and description */}
+                <div className="mb-2">
+                  <p className="mb-1">
+                    <span className="fw-bold me-2">{recipe.title}</span>
+                    <span className="text-muted">{recipe.description?.substring(0, 100)}{recipe.description?.length > 100 ? '...' : ''}</span>
+                  </p>
+                  <Link to={`/recipes/${recipe.id}`} className="text-muted text-decoration-none small">
+                    View Details
+                  </Link>
+                </div>
+                
+                {/* Comments section */}
+                <div className="mt-2">
+                  {comments[recipe.id]?.length > 0 && (
+                    <div className="mb-2">
+                      <Link to={`/recipes/${recipe.id}`} className="text-muted text-decoration-none small">
+                        View all {comments[recipe.id].length} comments
+                      </Link>
+                      
+                      {/* Show last 2 comments */}
+                      <div className="mt-1">
+                        {comments[recipe.id].slice(-2).map(comment => (
+                          <div key={comment.id} className="d-flex mb-1">
+                            {editingComment.id === comment.id ? (
+                              <div className="w-100">
+                                <div className="input-group mb-1">
+                                  <input
+                                    type="text"
+                                    className="form-control form-control-sm"
+                                    value={editingComment.text}
+                                    onChange={(e) => setEditingComment({ ...editingComment, text: e.target.value })}
+                                  />
                                   <button 
-                                    className="edit-comment-button"
-                                    onClick={() => startEditingComment(comment)}
+                                    className="btn btn-success btn-sm"
+                                    onClick={() => handleUpdateComment(recipe.id, comment.id)}
                                   >
-                                    <FaEdit size={12} /> 
+                                    <FaCheck />
                                   </button>
                                   <button 
-                                    className="delete-comment-button"
-                                    onClick={() => handleDeleteComment(recipe.id, comment.id)}
+                                    className="btn btn-secondary btn-sm"
+                                    onClick={cancelEditing}
                                   >
-                                    <FaTrash size={12} /> 
+                                    <FaTimes />
                                   </button>
                                 </div>
-                              )}
-                            </>
-                          )}
-                        </div>
-                      ))
-                    ) : (
-                      <p className="no-comments-message">
-                        No comments yet. Be the first to comment!
-                      </p>
-                    )}
-                  </div>
-
-                  <div className="add-comment-section">
+                              </div>
+                            ) : (
+                              <>
+                                <p className="mb-0">
+                                  <span className="fw-bold me-2">{comment.username}</span>
+                                  <span>{comment.text}</span>
+                                </p>
+                                
+                                {comment.userId === userId && (
+                                  <div className="ms-auto">
+                                    <button 
+                                      className="btn btn-link text-secondary p-0 me-2 border-0"
+                                      onClick={() => startEditingComment(comment)}
+                                    >
+                                      <FaEdit size={14} />
+                                    </button>
+                                    <button 
+                                      className="btn btn-link text-danger p-0 border-0"
+                                      onClick={() => handleDeleteComment(recipe.id, comment.id)}
+                                    >
+                                      <FaTrash size={14} />
+                                    </button>
+                                  </div>
+                                )}
+                              </>
+                            )}
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                  
+                  {/* Timestamp */}
+                  <p className="text-muted small mb-2">
+                    {moment(recipe.createdAt).fromNow()}
+                  </p>
+                  
+                  {/* Add comment input */}
+                  <div className="input-group input-group-sm border-top pt-2">
                     <input
                       type="text"
+                      className="form-control border-0 bg-light"
                       placeholder="Add a comment..."
-                      className="comment-input"
                       value={newComments[recipe.id] || ''}
                       onChange={(e) => setNewComments(prev => ({ ...prev, [recipe.id]: e.target.value }))}
                     />
                     <button 
-                      className="post-comment-button"
+                      className="btn btn-link text-primary"
                       onClick={() => handleAddComment(recipe.id)}
+                      disabled={!newComments[recipe.id]?.trim()}
                     >
                       Post
                     </button>
                   </div>
                 </div>
-
-                <div className="view-details-button-container">
-                  <Link 
-                    to={`/recipes/${recipe.id}`}
-                    className="view-details-button"
-                  >
-                    View Details
-                  </Link>
-                  
-                </div>
               </div>
             </div>
-          </div>
-        ))}
+          ))}
+        </div>
       </div>
-
-      <style jsx>{`
-        .my-recipes-container {
-          max-width: 1200px;
-          margin: 0 auto;
-          padding: 20px;
-          background-color: #f8f9fa;
-          min-height: 100vh;
-        }
-
-        .loading-container {
-          display: flex;
-          justify-content: center;
-          align-items: center;
-          height: 100vh;
-          font-size: 1.5rem;
-          color: #666;
-        }
-
-        .header-section {
-          display: flex;
-          justify-content: space-between;
-          align-items: center;
-          margin-bottom: 30px;
-          padding-bottom: 15px;
-          border-bottom: 1px solid #dee2e6;
-        }
-
-        .header-section h2 {
-          color: #343a40;
-          font-weight: 600;
-          margin: 0;
-        }
-
-        .add-recipe-button {
-          background-color: #28a745;
-          color: white;
-          padding: 8px 16px;
-          border-radius: 4px;
-          text-decoration: none;
-          font-weight: 500;
-          display: inline-flex;
-          align-items: center;
-          gap: 8px;
-          transition: all 0.3s;
-        }
-
-        .add-recipe-button:hover {
-          background-color: #218838;
-          transform: translateY(-2px);
-        }
-
-        .empty-state {
-          text-align: center;
-          padding: 40px;
-          background-color: white;
-          border-radius: 8px;
-          box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-        }
-
-        .empty-state p {
-          font-size: 1.2rem;
-          color: #6c757d;
-        }
-
-        .recipes-grid {
-          display: grid;
-          grid-template-columns: repeat(auto-fill, minmax(500px, 1fr));
-          gap: 25px;
-          margin-top: 20px;
-        }
-
-        .recipe-card {
-          background-color: white;
-          border-radius: 10px;
-          overflow: hidden;
-          box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-          transition: transform 0.3s, box-shadow 0.3s;
-        }
-
-        .recipe-card:hover {
-          transform: translateY(-5px);
-          box-shadow: 0 6px 16px rgba(0,0,0,0.15);
-        }
-
-        .recipe-content {
-          display: flex;
-          height: 100%;
-        }
-
-        .recipe-image-container {
-          width: 40%;
-          min-height: 300px;
-          overflow: hidden;
-        }
-
-        .recipe-image {
-          width: 100%;
-          height: 100%;
-          object-fit: cover;
-          object-position: center;
-        }
-
-        .recipe-details {
-          padding: 20px;
-          display: flex;
-          flex-direction: column;
-        }
-
-        .recipe-details.with-image {
-          width: 60%;
-        }
-
-        .recipe-details.full-width {
-          width: 100%;
-        }
-
-        .recipe-title {
-          margin: 0 0 10px 0;
-          color: #212529;
-          font-size: 1.5rem;
-          font-weight: 600;
-        }
-
-        .recipe-description {
-          color: #495057;
-          font-size: 0.95rem;
-          margin-bottom: 15px;
-          flex-grow: 1;
-        }
-
-        .like-section {
-          display: flex;
-          align-items: center;
-          margin-bottom: 15px;
-          gap: 10px;
-        }
-
-        .like-button {
-          border: none;
-          background: transparent;
-          cursor: pointer;
-          padding: 5px;
-          border-radius: 50%;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          transition: all 0.2s;
-        }
-
-        .like-button:hover {
-          background-color: rgba(220, 53, 69, 0.1);
-        }
-
-        .liked-icon {
-          color: #dc3545;
-          font-size: 1.2rem;
-        }
-
-        .not-liked-icon {
-          color: #6c757d;
-          font-size: 1.2rem;
-        }
-
-        .like-count {
-          color: #6c757d;
-          font-size: 0.9rem;
-        }
-
-        .comments-section {
-          margin-bottom: 15px;
-        }
-
-        .comments-header {
-          display: flex;
-          align-items: center;
-          margin-bottom: 10px;
-          color: #495057;
-          gap: 8px;
-        }
-
-        .comment-icon {
-          color: #6c757d;
-        }
-
-        .comments-list {
-          max-height: 150px;
-          overflow-y: auto;
-          padding: 10px;
-          background-color: #f8f9fa;
-          border-radius: 6px;
-          margin-bottom: 10px;
-        }
-
-        .comment-item {
-          margin-bottom: 12px;
-          padding-bottom: 12px;
-          border-bottom: 1px solid #e9ecef;
-        }
-
-        .comment-header {
-          display: flex;
-          justify-content: space-between;
-          margin-bottom: 5px;
-        }
-
-        .comment-header strong {
-          color: #212529;
-        }
-
-        .comment-header small {
-          color: #6c757d;
-        }
-
-        .comment-text {
-          margin: 0 0 8px 0;
-          color: #495057;
-          font-size: 0.9rem;
-        }
-
-        .comment-edit-input {
-          width: 100%;
-          padding: 6px 10px;
-          border: 1px solid #ced4da;
-          border-radius: 4px;
-          margin-bottom: 8px;
-        }
-
-        .comment-edit-actions {
-          display: flex;
-          justify-content: flex-end;
-          gap: 8px;
-        }
-
-        .save-edit-button {
-          border: none;
-          background-color: #28a745;
-          color: white;
-          padding: 4px 8px;
-          border-radius: 4px;
-          cursor: pointer;
-          display: flex;
-          align-items: center;
-          gap: 4px;
-        }
-
-        .cancel-edit-button {
-          border: none;
-          background-color: #6c757d;
-          color: white;
-          padding: 4px 8px;
-          border-radius: 4px;
-          cursor: pointer;
-          display: flex;
-          align-items: center;
-          gap: 4px;
-        }
-
-        .comment-actions {
-          display: flex;
-          justify-content: flex-end;
-          gap: 8px;
-        }
-
-        .edit-comment-button {
-          border: none;
-          background-color: #17a2b8;
-          color: white;
-          padding: 4px 8px;
-          border-radius: 4px;
-          cursor: pointer;
-          display: flex;
-          align-items: center;
-          gap: 4px;
-        }
-
-        .delete-comment-button {
-          border: none;
-          background-color: #dc3545;
-          color: white;
-          padding: 4px 8px;
-          border-radius: 4px;
-          cursor: pointer;
-          display: flex;
-          align-items: center;
-          gap: 4px;
-        }
-
-        .no-comments-message {
-          color: #6c757d;
-          font-size: 0.9rem;
-          text-align: center;
-          margin: 10px 0;
-        }
-
-        .add-comment-section {
-          display: flex;
-          gap: 10px;
-          margin-top: 10px;
-        }
-
-        .comment-input {
-          flex-grow: 1;
-          padding: 8px 12px;
-          border: 1px solid #ced4da;
-          border-radius: 4px;
-          font-size: 0.9rem;
-        }
-
-        .post-comment-button {
-          border: none;
-          background-color: #007bff;
-          color: white;
-          padding: 8px 16px;
-          border-radius: 4px;
-          cursor: pointer;
-          font-weight: 500;
-          transition: background-color 0.2s;
-        }
-
-        .post-comment-button:hover {
-          background-color: #0069d9;
-        }
-
-        .view-details-button-container {
-          margin-top: auto;
-          display: flex;
-          justify-content: flex-end;
-        }
-
-        .view-details-button {
-          background-color: #6c757d;
-          color: white;
-          padding: 8px 16px;
-          border-radius: 4px;
-          text-decoration: none;
-          font-size: 0.9rem;
-          transition: all 0.2s;
-        }
-
-        .view-details-button:hover {
-          background-color: #5a6268;
-        }
-      `}</style>
     </div>
   );
 };
 
-export default MyRecipes;
+export default AllRecipes;

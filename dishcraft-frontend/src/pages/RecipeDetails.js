@@ -171,7 +171,7 @@ const RecipeDetails = () => {
             paddingLeft: '1.5rem',
             margin: 0
           }}>
-            {recipe.steps && recipe.steps.map((step, idx) => (
+            {recipe.instructions && recipe.instructions.map((step, idx) => (
               <li key={idx} style={{
                 padding: '0.5rem 0',
                 borderBottom: '1px solid #eee',

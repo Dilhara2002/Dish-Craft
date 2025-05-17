@@ -1,448 +1,288 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import { Link } from 'react-router-dom';
-import { FaTrash, FaEdit, FaEye } from 'react-icons/fa';
+import { 
+  FaHeart, FaRegHeart, FaComment, FaEdit, 
+  FaTrash, FaCheck, FaTimes, FaPlus 
+} from 'react-icons/fa';
+import moment from 'moment';
+import 'bootstrap/dist/css/bootstrap.min.css';
 
-const MyRecipesEdit = () => {
-  const [myRecipes, setMyRecipes] = useState([]);
-  const [selectedRecipe, setSelectedRecipe] = useState(null);
-  const [showModal, setShowModal] = useState(false);
-  const [editForm, setEditForm] = useState({
-    title: '',
-    description: '',
-    ingredients: '',
-    steps: '',
-    imageUrl: '',
-    tags: ''
-  });
+const MyRecipes = () => {
+  const [recipes, setRecipes] = useState([]);
+  const [comments, setComments] = useState({});
+  const [likes, setLikes] = useState({});
+  const [newComments, setNewComments] = useState({});
+  const [editingComment, setEditingComment] = useState({ id: null, text: '' });
+  const [loading, setLoading] = useState(true);
 
   const token = localStorage.getItem('token');
   const userId = localStorage.getItem('userId');
+  const username = localStorage.getItem('username');
 
   useEffect(() => {
-    if (!userId) return;
-
-    axios.get(`http://localhost:8080/api/recipes/user/${userId}`, {
+    axios.get('http://localhost:8080/api/recipes', {
       headers: { Authorization: `Bearer ${token}` }
     })
-      .then(res => setMyRecipes(res.data))
-      .catch(err => console.error('Error fetching recipes:', err));
-  }, [userId, token]);
+    .then(res => {
+      const fetched = res.data.filter(recipe => recipe.userId === userId);
+      setRecipes(fetched);
 
-  const handleDelete = (id) => {
-    if (window.confirm("Are you sure you want to delete this recipe?")) {
-      axios.delete(`http://localhost:8080/api/recipes/${id}`, {
-        headers: { 
-          Authorization: `Bearer ${token}`,
-          userId: userId
+      const initialLikes = {};
+      const initialComments = {};
+      fetched.forEach(recipe => {
+        initialLikes[recipe.id] = { count: 0, isLiked: false, likeId: null };
+        initialComments[recipe.id] = [];
+      });
+      setLikes(initialLikes);
+      setComments(initialComments);
+
+      fetched.forEach(recipe => {
+        fetchRecipeInteractions(recipe.id);
+      });
+
+      setLoading(false);
+    })
+    .catch(err => {
+      console.error('Error fetching recipes:', err);
+      setLoading(false);
+    });
+  }, []);
+
+  const fetchRecipeInteractions = (recipeId) => {
+    if (!recipeId) return;
+
+    axios.get(`http://localhost:8080/api/interaction/likes/recipe/${recipeId}`, {
+      headers: { Authorization: `Bearer ${token}` }
+    })
+    .then(res => {
+      const userLike = res.data.find(like => like.userId === userId);
+      setLikes(prev => ({
+        ...prev,
+        [recipeId]: {
+          count: res.data.length,
+          isLiked: !!userLike,
+          likeId: userLike?.id || null
         }
+      }));
+    })
+    .catch(err => console.error('Error fetching likes:', err));
+
+    axios.get(`http://localhost:8080/api/interaction/comments/recipe/${recipeId}`, {
+      headers: { Authorization: `Bearer ${token}` }
+    })
+    .then(res => {
+      setComments(prev => ({
+        ...prev,
+        [recipeId]: res.data.map(comment => ({
+          ...comment,
+          createdAt: moment(comment.createdAt).format('MMM D, YYYY h:mm A'),
+          updatedAt: moment(comment.updatedAt).format('MMM D, YYYY h:mm A')
+        }))
+      }));
+    })
+    .catch(err => console.error('Error fetching comments:', err));
+  };
+
+  const handleLike = (recipeId) => {
+    const current = likes[recipeId];
+    if (!current) return;
+
+    if (current.isLiked) {
+      axios.delete(`http://localhost:8080/api/interaction/likes/${recipeId}`, {
+        headers: { Authorization: `Bearer ${token}`, userId }
       })
-        .then(() => {
-          setMyRecipes(myRecipes.filter(recipe => recipe.id !== id));
-        })
-        .catch(err => console.error('Delete error:', err));
+      .then(() => {
+        setLikes(prev => ({
+          ...prev,
+          [recipeId]: {
+            ...prev[recipeId],
+            count: prev[recipeId].count - 1,
+            isLiked: false,
+            likeId: null
+          }
+        }));
+      })
+      .catch(err => console.error('Error unliking recipe:', err));
+    } else {
+      axios.post(`http://localhost:8080/api/interaction/likes/${recipeId}`, {}, {
+        headers: { Authorization: `Bearer ${token}`, userId }
+      })
+      .then(res => {
+        setLikes(prev => ({
+          ...prev,
+          [recipeId]: {
+            count: prev[recipeId].count + 1,
+            isLiked: true,
+            likeId: res.data.id
+          }
+        }));
+      })
+      .catch(err => console.error('Error liking recipe:', err));
     }
   };
 
-  const openEditModal = (recipe) => {
-    setSelectedRecipe(recipe);
-    setEditForm({
-      title: recipe.title,
-      description: recipe.description,
-      ingredients: recipe.ingredients?.join(', ') || '',
-      steps: recipe.instructions?.join('. ') || '',
-      imageUrl: recipe.imageUrl || '',
-      tags: recipe.tags?.join(', ') || ''
-    });
-    setShowModal(true);
-  };
+  const handleAddComment = (recipeId) => {
+    const text = newComments[recipeId]?.trim();
+    if (!text) return;
 
-  const handleChange = (e) => {
-    setEditForm({ ...editForm, [e.target.name]: e.target.value });
-  };
-
-  const handleUpdate = () => {
-    const updatedPayload = {
-      title: editForm.title,
-      description: editForm.description,
-      ingredients: editForm.ingredients.split(',').map(i => i.trim()),
-      instructions: editForm.steps.split('.').map(s => s.trim()).filter(s => s),
-      imageUrl: editForm.imageUrl,
-      tags: editForm.tags ? editForm.tags.split(',').map(t => t.trim()) : []
-    };
-
-    axios.put(`http://localhost:8080/api/recipes/${selectedRecipe.id}`, updatedPayload, {
-      headers: { 
-        Authorization: `Bearer ${token}`,
-        userId: userId
-      }
+    axios.post(`http://localhost:8080/api/interaction/comments/${recipeId}`, null, {
+      params: { text },
+      headers: { Authorization: `Bearer ${token}`, userId }
     })
-      .then(res => {
-        setMyRecipes(myRecipes.map(r => r.id === selectedRecipe.id ? res.data : r));
-        setShowModal(false);
-      })
-      .catch(err => console.error('Update error:', err));
+    .then(res => {
+      const newCommentObj = {
+        ...res.data,
+        username,
+        createdAt: moment(res.data.createdAt).format('MMM D, YYYY h:mm A'),
+        updatedAt: moment(res.data.updatedAt).format('MMM D, YYYY h:mm A')
+      };
+      setComments(prev => ({
+        ...prev,
+        [recipeId]: [...(prev[recipeId] || []), newCommentObj]
+      }));
+      setNewComments(prev => ({ ...prev, [recipeId]: '' }));
+    })
+    .catch(err => console.error('Error adding comment:', err));
   };
+
+  const startEditingComment = (comment) => {
+    setEditingComment({ id: comment.id, text: comment.text });
+  };
+
+  const cancelEditing = () => {
+    setEditingComment({ id: null, text: '' });
+  };
+
+  const handleUpdateComment = (recipeId, commentId) => {
+    axios.put(`http://localhost:8080/api/interaction/comments/${commentId}`, null, {
+      params: { text: editingComment.text },
+      headers: { Authorization: `Bearer ${token}`, userId }
+    })
+    .then(res => {
+      setComments(prev => ({
+        ...prev,
+        [recipeId]: prev[recipeId].map(c => 
+          c.id === commentId 
+            ? { ...c, text: res.data.text, updatedAt: moment(res.data.updatedAt).format('MMM D, YYYY h:mm A') }
+            : c
+        )
+      }));
+      cancelEditing();
+    })
+    .catch(err => console.error('Error updating comment:', err));
+  };
+
+  const handleDeleteComment = (recipeId, commentId) => {
+    axios.delete(`http://localhost:8080/api/interaction/comments/${commentId}`, {
+      headers: { Authorization: `Bearer ${token}`, userId }
+    })
+    .then(() => {
+      setComments(prev => ({
+        ...prev,
+        [recipeId]: prev[recipeId].filter(c => c.id !== commentId)
+      }));
+    })
+    .catch(err => console.error('Error deleting comment:', err));
+  };
+
+  if (loading) {
+    return (
+      <div className="d-flex justify-content-center align-items-center vh-100">
+        <div className="spinner-border text-primary" role="status">
+          <span className="visually-hidden">Loading...</span>
+        </div>
+      </div>
+    );
+  }
 
   return (
-    <div className="container mt-4" style={{
-      maxWidth: '1200px',
-      fontFamily: "'Segoe UI', Tahoma, Geneva, Verdana, sans-serif",
-      background: 'linear-gradient(to bottom, #f9f9f9, #eef2f5)',
-      minHeight: '100vh',
-      padding: '30px'
-    }}>
-      <div style={{
-        display: 'flex',
-        justifyContent: 'space-between',
-        alignItems: 'center',
-        marginBottom: '30px',
-        paddingBottom: '15px',
-        borderBottom: '1px solid #e0e0e0'
-      }}>
-        <h2 style={{
-          color: '#2c3e50',
-          fontWeight: '600',
-          fontSize: '2rem',
-          margin: '0'
-        }}></h2>
-        <Link 
-          to="/add" 
-          style={{
-            backgroundColor: '#28a745',
-            color: 'white',
-            padding: '8px 16px',
-            borderRadius: '4px',
-            textDecoration: 'none',
-            fontWeight: '500',
-            display: 'inline-flex',
-            alignItems: 'center',
-            gap: '8px',
-            transition: 'all 0.3s',
-            ':hover': {
-              backgroundColor: '#218838',
-              transform: 'translateY(-2px)'
-            }
-          }}
-        >
-          Add New Recipe
-        </Link>
-      </div>
-
-      {myRecipes.length === 0 ? (
-        <div style={{
-          textAlign: 'center',
-          padding: '50px',
-          background: '#fff',
-          borderRadius: '10px',
-          boxShadow: '0 2px 10px rgba(0,0,0,0.05)'
-        }}>
-          <h4 style={{ color: '#7f8c8d', marginBottom: '20px' }}>No recipes found</h4>
-          <Link 
-            to="/add" 
-            className="btn btn-primary" 
-            style={{
-              padding: '10px 25px',
-              borderRadius: '8px',
-              fontWeight: '500'
-            }}
-          >
-            Create Your First Recipe
-          </Link>
+    <div className="bg-light min-vh-100 py-4">
+      <div className="container">
+        <div className="sticky-top bg-white border-bottom shadow-sm mb-4">
+          <div className="container d-flex justify-content-between align-items-center py-3">
+            <h2 className="h4 mb-0 fw-bold text-primary">My Recipes</h2>
+            <Link 
+              to="/add" 
+              className="btn btn-primary rounded-circle p-2"
+              title="Add New Recipe"
+            >
+              <FaPlus />
+            </Link>
+          </div>
         </div>
-      ) : (
-        <div className="row" style={{ margin: '0 -10px' }}>
-          {myRecipes.map((recipe, index) => (
-            <div key={recipe.id || index} className="col-md-4 mb-4" style={{ padding: '0 10px' }}>
-              <div className="card h-100" style={{
-                border: 'none',
-                borderRadius: '12px',
-                overflow: 'hidden',
-                boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
-                transition: 'all 0.3s ease',
-                ':hover': {
-                  transform: 'translateY(-5px)',
-                  boxShadow: '0 8px 20px rgba(0,0,0,0.15)'
-                }
-              }}>
-                {recipe.imageUrl && (
+
+        {recipes.length === 0 && (
+          <div className="card text-center p-5 mb-4">
+            <div className="card-body">
+              <h5 className="card-title">No recipes found</h5>
+              <p className="card-text text-muted">You haven't created any recipes yet.</p>
+              <Link to="/add" className="btn btn-primary">
+                Add New Recipe
+              </Link>
+            </div>
+          </div>
+        )}
+
+        <div className="d-flex flex-column align-items-center">
+          {recipes.map((recipe) => (
+            <div key={recipe.id} className="card mb-4 border-0 shadow-sm" style={{ maxWidth: "600px", width: "100%" }}>
+              <div className="card-header bg-white d-flex align-items-center p-3 border-0">
+                <div className="rounded-circle bg-secondary text-white d-flex align-items-center justify-content-center me-2" style={{ width: "40px", height: "40px" }}>
+                  {recipe.username?.charAt(0).toUpperCase() || "U"}
+                </div>
+                <div>
+                  <h6 className="mb-0 fw-bold">{recipe.username || "User"}</h6>
+                </div>
+              </div>
+
+              {recipe.imageUrl && (
+                <div className="position-relative" style={{ paddingBottom: "100%", overflow: "hidden" }}>
                   <img
                     src={recipe.imageUrl}
                     alt={recipe.title}
-                    className="card-img-top"
-                    style={{ 
-                      height: '220px', 
-                      objectFit: 'cover',
-                      width: '100%'
-                    }}
+                    className="position-absolute top-0 start-0 w-100 h-100 object-fit-cover"
                   />
-                )}
-                <div className="card-body" style={{ padding: '20px' }}>
-                  <h5 className="card-title" style={{
-                    fontSize: '1.25rem',
-                    fontWeight: '600',
-                    color: '#2c3e50',
-                    marginBottom: '10px',
-                    whiteSpace: 'nowrap',
-                    overflow: 'hidden',
-                    textOverflow: 'ellipsis'
-                  }}>
-                    {recipe.title}
-                  </h5>
-                  <p className="card-text" style={{
-                    color: '#7f8c8d',
-                    fontSize: '0.95rem',
-                    marginBottom: '20px',
-                    height: '60px',
-                    overflow: 'hidden',
-                    display: '-webkit-box',
-                    WebkitLineClamp: '3',
-                    WebkitBoxOrient: 'vertical'
-                  }}>
-                    {recipe.description?.substring(0, 100)}...
+                </div>
+              )}
+
+              <div className="card-body p-3 pt-2">
+                <div className="d-flex gap-3 mb-2">
+                  <button 
+                    onClick={() => handleLike(recipe.id)} 
+                    className="btn btn-link p-0 border-0"
+                  >
+                    {likes[recipe.id]?.isLiked ? (
+                      <FaHeart className="fs-4 text-danger" />
+                    ) : (
+                      <FaRegHeart className="fs-4" />
+                    )}
+                  </button>
+                  <Link to={`/recipes/${recipe.id}`} className="btn btn-link p-0 border-0">
+                    <FaComment className="fs-4" />
+                  </Link>
+                </div>
+
+                <div className="mb-1">
+                  <p className="fw-bold mb-0">{likes[recipe.id]?.count || 0} likes</p>
+                </div>
+
+                <div className="mb-2">
+                  <p className="mb-1">
+                    <span className="fw-bold me-2">{recipe.title}</span>
+                    <span className="text-muted">{recipe.description?.substring(0, 100)}{recipe.description?.length > 100 ? '...' : ''}</span>
                   </p>
-                  <div style={{ 
-                    display: 'flex', 
-                    gap: '8px', 
-                    justifyContent: 'flex-end',
-                    marginTop: 'auto'
-                  }}>
-                    <Link
-                      to={`/recipes/${recipe.id}`}
-                      style={{
-                        backgroundColor: '#6c757d',
-                        color: 'white',
-                        padding: '6px 12px',
-                        borderRadius: '4px',
-                        textDecoration: 'none',
-                        display: 'flex',
-                        alignItems: 'center',
-                        gap: '6px',
-                        fontSize: '0.875rem',
-                        transition: 'all 0.2s ease',
-                        ':hover': {
-                          backgroundColor: '#5a6268',
-                          transform: 'translateY(-1px)'
-                        }
-                      }}
-                    >
-                      <FaEye size={14} />
-                      View
-                    </Link><br/>
-                    <button 
-                      onClick={() => openEditModal(recipe)}
-                      style={{
-                        border: 'none',
-                        backgroundColor: '#17a2b8',
-                        color: 'white',
-                        padding: '6px 12px',
-                        borderRadius: '4px',
-                        cursor: 'pointer',
-                        display: 'flex',
-                        alignItems: 'center',
-                        gap: '6px',
-                        fontSize: '0.875rem',
-                        transition: 'all 0.2s ease',
-                        ':hover': {
-                          backgroundColor: '#138496',
-                          transform: 'translateY(-1px)'
-                        }
-                      }}
-                    >
-                      <FaEdit size={14} />
-                      
-                    </button>
-                    <button 
-                      onClick={() => handleDelete(recipe.id)}
-                      style={{
-                        border: 'none',
-                        backgroundColor: '#dc3545',
-                        color: 'white',
-                        padding: '6px 12px',
-                        borderRadius: '4px',
-                        cursor: 'pointer',
-                        display: 'flex',
-                        alignItems: 'center',
-                        gap: '6px',
-                        fontSize: '0.875rem',
-                        transition: 'all 0.2s ease',
-                        ':hover': {
-                          backgroundColor: '#c82333',
-                          transform: 'translateY(-1px)'
-                        }
-                      }}
-                    >
-                      <FaTrash size={14} />
-                      
-                    </button>
-                  </div>
+                  <Link to={`/recipes/${recipe.id}`} className="text-muted text-decoration-none">
+                    View full recipe
+                  </Link>
                 </div>
               </div>
             </div>
           ))}
         </div>
-      )}
-
-      {/* Edit Modal */}
-      {showModal && (
-        <div className="modal d-block" tabIndex="-1" style={{ 
-          backgroundColor: "rgba(0,0,0,0.5)",
-          position: 'fixed',
-          top: 0,
-          left: 0,
-          right: 0,
-          bottom: 0,
-          zIndex: 1050,
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center'
-        }}>
-          <div className="modal-dialog modal-lg" style={{ 
-            maxWidth: '800px',
-            margin: '1.75rem auto'
-          }}>
-            <div className="modal-content" style={{
-              border: 'none',
-              borderRadius: '12px',
-              overflow: 'hidden',
-              boxShadow: '0 5px 20px rgba(0,0,0,0.2)'
-            }}>
-              <div className="modal-header" style={{
-                background: 'linear-gradient(135deg, #3498db, #2980b9)',
-                color: 'white',
-                padding: '20px',
-                borderBottom: 'none'
-              }}>
-                <h5 className="modal-title" style={{
-                  fontSize: '1.5rem',
-                  fontWeight: '600'
-                }}>Edit Recipe</h5>
-                <button 
-                  type="button" 
-                  className="close" 
-                  onClick={() => setShowModal(false)}
-                  style={{
-                    color: 'white',
-                    opacity: '0.8',
-                    fontSize: '1.8rem',
-                    background: 'none',
-                    border: 'none',
-                    transition: 'opacity 0.2s ease',
-                    ':hover': {
-                      opacity: '1'
-                    }
-                  }}
-                >
-                  <span>&times;</span>
-                </button>
-              </div>
-              
-              <div className="modal-body" style={{ padding: '25px' }}>
-                {['title', 'description', 'ingredients', 'steps', 'imageUrl', 'tags'].map((field, index) => (
-                  <div className="form-group mb-4" key={index} style={{ marginBottom: '20px' }}>
-                    <label style={{
-                      display: 'block',
-                      marginBottom: '8px',
-                      fontWeight: '500',
-                      color: '#2c3e50',
-                      fontSize: '0.95rem'
-                    }}>
-                      {field.charAt(0).toUpperCase() + field.slice(1)}
-                    </label>
-                    {field === 'description' || field === 'steps' ? (
-                      <textarea
-                        className="form-control"
-                        name={field}
-                        value={editForm[field]}
-                        onChange={handleChange}
-                        rows={field === 'steps' ? '5' : '3'}
-                        style={{
-                          width: '100%',
-                          padding: '12px 15px',
-                          borderRadius: '8px',
-                          border: '1px solid #ddd',
-                          fontSize: '0.95rem',
-                          transition: 'all 0.3s ease',
-                          ':focus': {
-                            borderColor: '#3498db',
-                            boxShadow: '0 0 0 0.2rem rgba(52, 152, 219, 0.25)',
-                            outline: 'none'
-                          }
-                        }}
-                      />
-                    ) : (
-                      <input
-                        type="text"
-                        className="form-control"
-                        name={field}
-                        value={editForm[field]}
-                        onChange={handleChange}
-                        style={{
-                          width: '100%',
-                          padding: '12px 15px',
-                          borderRadius: '8px',
-                          border: '1px solid #ddd',
-                          fontSize: '0.95rem',
-                          transition: 'all 0.3s ease',
-                          ':focus': {
-                            borderColor: '#3498db',
-                            boxShadow: '0 0 0 0.2rem rgba(52, 152, 219, 0.25)',
-                            outline: 'none'
-                          }
-                        }}
-                      />
-                    )}
-                  </div>
-                ))}
-              </div>
-              <div className="modal-footer" style={{
-                padding: '20px',
-                borderTop: '1px solid #eee',
-                background: '#f8f9fa',
-                justifyContent: 'flex-end'
-              }}>
-                <button 
-                  onClick={() => setShowModal(false)} 
-                  className="btn btn-secondary" 
-                  style={{
-                    padding: '10px 20px',
-                    borderRadius: '8px',
-                    fontWeight: '500',
-                    marginRight: '10px',
-                    transition: 'all 0.2s ease',
-                    ':hover': {
-                      background: '#6c757d',
-                      transform: 'translateY(-1px)'
-                    }
-                  }}
-                >
-                  Cancel
-                </button>
-                <button 
-                  onClick={handleUpdate} 
-                  className="btn btn-primary"
-                  style={{
-                    padding: '10px 25px',
-                    borderRadius: '8px',
-                    fontWeight: '500',
-                    background: 'linear-gradient(135deg, #3498db, #2980b9)',
-                    border: 'none',
-                    transition: 'all 0.2s ease',
-                    ':hover': {
-                      transform: 'translateY(-1px)',
-                      boxShadow: '0 2px 8px rgba(0,0,0,0.1)'
-                    }
-                  }}
-                >
-                  Update Recipe
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
+      </div>
     </div>
   );
 };
 
-export default MyRecipesEdit;
+export default MyRecipes;
