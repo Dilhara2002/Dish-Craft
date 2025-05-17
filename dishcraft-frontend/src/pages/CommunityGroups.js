@@ -131,12 +131,12 @@ const CommunityGroups = () => {
         paddingBottom: '15px',
         borderBottom: '1px solid #dee2e6'
       }}>
-        <h2 style={{
+        {/* <h2 style={{
           color: '#343a40',
           fontWeight: '600',
           margin: 0
-        }}>Community Groups</h2>
-        <button
+        }}>Community Groups</h2> */}
+        {/* <button
           style={{
             backgroundColor: '#28a745',
             color: 'white',
@@ -157,7 +157,7 @@ const CommunityGroups = () => {
           onClick={() => navigate('/groups/create')}
         >
           <FaPlus /> Create New Group
-        </button>
+        </button> */}
       </div>
 
       {/* Create Group Form */}

@@ -1,5 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
+import DishCraftLogo from '../image/DishCraftLogo.png';
 
 const Navbar = ({ isLoggedIn = false }) => {
   const styles = {
@@ -58,15 +59,18 @@ const Navbar = ({ isLoggedIn = false }) => {
   };
 
   return (
-    <nav style={styles.navbar}>
-      <Link to="/" style={styles.brandLink}>
-        {/* Update the image import path as needed */}
-        <img src="/path/to/DishCraftLogo.png" alt="DishCraft Logo" style={styles.logoImage} />
-        <span>Dish Craft</span>
-      </Link>
+   <nav style={styles.navbar}>
+         <Link to="/login" style={styles.brandLink}>
+           <img 
+             src={DishCraftLogo} 
+             alt="Dish Craft Logo" 
+             style={styles.logoImage} 
+           />
+           Dish Craft
+         </Link>
       
       <div style={styles.navLinks}>
-        <Link to="/all-recipes" style={styles.navLink}>Recipes</Link>
+        
         
         {isLoggedIn ? (
           <>
@@ -82,7 +86,7 @@ const Navbar = ({ isLoggedIn = false }) => {
           </>
         ) : (
           <>
-            <Link to="/login" style={styles.navLink}>Logins</Link>
+            <Link to="/login" style={styles.navLink}>Login</Link>
             <Link to="/register" style={styles.navLink}>Register</Link>
           </>
         )}
