@@ -34,6 +34,7 @@ out/
 /.nb-gradle/
 
 ### VS Code ###
-.vscode/
 /dishcraft
 /target
+config.bat
+node_modules
