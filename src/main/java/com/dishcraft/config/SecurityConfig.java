@@ -34,9 +34,9 @@ public class SecurityConfig {
             .cors().configurationSource(corsConfigurationSource()).and()
             .csrf().disable()
             .authorizeHttpRequests()
-            .requestMatchers(HttpMethod.OPTIONS, "/").permitAll() // Allow preflight requests
-            .requestMatchers("/api/auth/").permitAll()
-            .requestMatchers("/api/recipes/").permitAll()
+            .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll() // Allow preflight requests
+            .requestMatchers("/api/auth/**").permitAll()
+            .requestMatchers("/api/recipes/**").permitAll()
             .requestMatchers("/api/users/me").authenticated()
             .anyRequest().authenticated()
             .and()
@@ -57,7 +57,7 @@ public CorsConfigurationSource corsConfigurationSource() {
     configuration.setAllowCredentials(true);
 
     UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-    source.registerCorsConfiguration("/", configuration);
+    source.registerCorsConfiguration("/**", configuration);
     return source;
 }
 
