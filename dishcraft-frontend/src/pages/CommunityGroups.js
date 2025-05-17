@@ -24,11 +24,7 @@ const CommunityGroups = () => {
   const fetchGroups = async () => {
     try {
       const response = await axios.get('http://localhost:8080/api/groups', {
-
         headers: { Authorization: `Bearer ${token}` }
-
-        headers: { Authorization: Bearer ${token} }
-
       });
       setGroups(response.data);
       setLoading(false);
@@ -41,11 +37,7 @@ const CommunityGroups = () => {
   const handleCreateGroup = async () => {
     try {
       await axios.post('http://localhost:8080/api/groups', newGroup, {
-
         headers: { Authorization: `Bearer ${token}`, userId }
-
-        headers: { Authorization: Bearer ${token}, userId }
-
       });
       setNewGroup({ name: '', description: '' });
       fetchGroups();
@@ -64,13 +56,8 @@ const CommunityGroups = () => {
 
   const handleUpdateGroup = async () => {
     try {
-
       await axios.put(`http://localhost:8080/api/groups/${editingGroup.id}`, editingGroup, {
         headers: { Authorization: `Bearer ${token}`, userId }
-
-      await axios.put(http://localhost:8080/api/groups/${editingGroup.id}, editingGroup, {
-        headers: { Authorization: Bearer ${token}, userId }
-
       });
       cancelEditing();
       fetchGroups();
@@ -86,13 +73,8 @@ const CommunityGroups = () => {
 
   const handleDeleteGroup = async () => {
     try {
-
       await axios.delete(`http://localhost:8080/api/groups/${groupToDelete.id}`, {
         headers: { Authorization: `Bearer ${token}`, userId }
-
-      await axios.delete(http://localhost:8080/api/groups/${groupToDelete.id}, {
-        headers: { Authorization: Bearer ${token}, userId }
-
       });
       setShowDeleteModal(false);
       fetchGroups();
@@ -103,13 +85,8 @@ const CommunityGroups = () => {
 
   const handleJoinGroup = async (groupId) => {
     try {
-
       await axios.post(`http://localhost:8080/api/groups/${groupId}/join`, null, {
         headers: { Authorization: `Bearer ${token}`, userId }
-
-      await axios.post(http://localhost:8080/api/groups/${groupId}/join, null, {
-        headers: { Authorization: Bearer ${token}, userId }
-
       });
       fetchGroups();
     } catch (err) {
