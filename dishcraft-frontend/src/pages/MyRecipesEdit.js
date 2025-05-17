@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import { Link } from 'react-router-dom';
+import { FaTrash, FaEdit, FaEye } from 'react-icons/fa';
 
 const MyRecipesEdit = () => {
   const [myRecipes, setMyRecipes] = useState([]);
@@ -106,26 +107,26 @@ const MyRecipesEdit = () => {
           margin: '0'
         }}>My Recipes</h2>
         <Link 
-                  to="/add" 
-                  style={{
-                    backgroundColor: '#28a745',
-                    color: 'white',
-                    padding: '8px 16px',
-                    borderRadius: '4px',
-                    textDecoration: 'none',
-                    fontWeight: '500',
-                    display: 'inline-flex',
-                    alignItems: 'center',
-                    gap: '8px',
-                    transition: 'all 0.3s',
-                    ':hover': {
-                      backgroundColor: '#218838',
-                      transform: 'translateY(-2px)'
-                    }
-                  }}
-                >
-                  Add New Recipe
-                </Link>
+          to="/add" 
+          style={{
+            backgroundColor: '#28a745',
+            color: 'white',
+            padding: '8px 16px',
+            borderRadius: '4px',
+            textDecoration: 'none',
+            fontWeight: '500',
+            display: 'inline-flex',
+            alignItems: 'center',
+            gap: '8px',
+            transition: 'all 0.3s',
+            ':hover': {
+              backgroundColor: '#218838',
+              transform: 'translateY(-2px)'
+            }
+          }}
+        >
+          Add New Recipe
+        </Link>
       </div>
 
       {myRecipes.length === 0 ? (
@@ -200,40 +201,79 @@ const MyRecipesEdit = () => {
                   }}>
                     {recipe.description?.substring(0, 100)}...
                   </p>
-                  <div className="d-flex justify-content-between" style={{ marginTop: 'auto' }}>
+                  <div style={{ 
+                    display: 'flex', 
+                    gap: '8px', 
+                    justifyContent: 'flex-end',
+                    marginTop: 'auto'
+                  }}>
+                    <Link
+                      to={`/recipes/${recipe.id}`}
+                      style={{
+                        backgroundColor: '#6c757d',
+                        color: 'white',
+                        padding: '6px 12px',
+                        borderRadius: '4px',
+                        textDecoration: 'none',
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '6px',
+                        fontSize: '0.875rem',
+                        transition: 'all 0.2s ease',
+                        ':hover': {
+                          backgroundColor: '#5a6268',
+                          transform: 'translateY(-1px)'
+                        }
+                      }}
+                    >
+                      <FaEye size={14} />
+                      View
+                    </Link><br/>
                     <button 
-                      className="btn btn-sm btn-outline-primary" 
                       onClick={() => openEditModal(recipe)}
                       style={{
-                        padding: '8px 15px',
-                        borderRadius: '6px',
-                        fontWeight: '500',
-                        borderWidth: '1.5px',
+                        border: 'none',
+                        backgroundColor: '#17a2b8',
+                        color: 'white',
+                        padding: '6px 12px',
+                        borderRadius: '4px',
+                        cursor: 'pointer',
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '6px',
+                        fontSize: '0.875rem',
                         transition: 'all 0.2s ease',
                         ':hover': {
-                          background: '#3498db',
-                          color: 'white'
+                          backgroundColor: '#138496',
+                          transform: 'translateY(-1px)'
                         }
                       }}
                     >
-                      Edit
+                      <FaEdit size={14} />
+                      
                     </button>
                     <button 
-                      className="btn btn-sm btn-outline-danger" 
                       onClick={() => handleDelete(recipe.id)}
                       style={{
-                        padding: '8px 15px',
-                        borderRadius: '6px',
-                        fontWeight: '500',
-                        borderWidth: '1.5px',
+                        border: 'none',
+                        backgroundColor: '#dc3545',
+                        color: 'white',
+                        padding: '6px 12px',
+                        borderRadius: '4px',
+                        cursor: 'pointer',
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '6px',
+                        fontSize: '0.875rem',
                         transition: 'all 0.2s ease',
                         ':hover': {
-                          background: '#e74c3c',
-                          color: 'white'
+                          backgroundColor: '#c82333',
+                          transform: 'translateY(-1px)'
                         }
                       }}
                     >
-                      Delete
+                      <FaTrash size={14} />
+                      
                     </button>
                   </div>
                 </div>
@@ -296,6 +336,7 @@ const MyRecipesEdit = () => {
                   <span>&times;</span>
                 </button>
               </div>
+              
               <div className="modal-body" style={{ padding: '25px' }}>
                 {['title', 'description', 'ingredients', 'steps', 'imageUrl', 'tags'].map((field, index) => (
                   <div className="form-group mb-4" key={index} style={{ marginBottom: '20px' }}>
