@@ -38,11 +38,6 @@ public class SecurityConfig {
             .requestMatchers("/api/auth/").permitAll()
             .requestMatchers("/api/recipes/").permitAll()
             .requestMatchers("/api/users/me").authenticated()
-
-            .requestMatchers(HttpMethod.PUT, "/api/groups/**").authenticated()
-
-            .requestMatchers(HttpMethod.PUT, "/api/groups/").authenticated()
-
             .anyRequest().authenticated()
             .and()
             .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
