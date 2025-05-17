@@ -1,10 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import { Link } from 'react-router-dom';
-import { FaTrash } from 'react-icons/fa';
-import { FaEdit } from 'react-icons/fa';
-
-
+import { FaTrash, FaEdit, FaEye } from 'react-icons/fa';
 
 const MyRecipesEdit = () => {
   const [myRecipes, setMyRecipes] = useState([]);
@@ -108,28 +105,28 @@ const MyRecipesEdit = () => {
           fontWeight: '600',
           fontSize: '2rem',
           margin: '0'
-        }}></h2>
+        }}>My Recipes</h2>
         <Link 
-                  to="/add" 
-                  style={{
-                    backgroundColor: '#28a745',
-                    color: 'white',
-                    padding: '8px 16px',
-                    borderRadius: '4px',
-                    textDecoration: 'none',
-                    fontWeight: '500',
-                    display: 'inline-flex',
-                    alignItems: 'center',
-                    gap: '8px',
-                    transition: 'all 0.3s',
-                    ':hover': {
-                      backgroundColor: '#218838',
-                      transform: 'translateY(-2px)'
-                    }
-                  }}
-                >
-                  Add New Recipe
-                </Link>
+          to="/add" 
+          style={{
+            backgroundColor: '#28a745',
+            color: 'white',
+            padding: '8px 16px',
+            borderRadius: '4px',
+            textDecoration: 'none',
+            fontWeight: '500',
+            display: 'inline-flex',
+            alignItems: 'center',
+            gap: '8px',
+            transition: 'all 0.3s',
+            ':hover': {
+              backgroundColor: '#218838',
+              transform: 'translateY(-2px)'
+            }
+          }}
+        >
+          Add New Recipe
+        </Link>
       </div>
 
       {myRecipes.length === 0 ? (
@@ -204,54 +201,81 @@ const MyRecipesEdit = () => {
                   }}>
                     {recipe.description?.substring(0, 100)}...
                   </p>
-                  <div style={{ display: 'flex', gap: '8px', justifyContent: 'flex-end' }}>
-  <button 
-    onClick={() => openEditModal(recipe)}
-    style={{
-      border: 'none',
-      backgroundColor: '#17a2b8',
-      color: 'white',
-      padding: '6px 12px',
-      borderRadius: '4px',
-      cursor: 'pointer',
-      display: 'flex',
-      alignItems: 'center',
-      gap: '6px',
-      fontSize: '0.875rem',
-      transition: 'all 0.2s ease',
-      ':hover': {
-        backgroundColor: '#138496',
-        transform: 'translateY(-1px)'
-      }
-    }}
-  >
-    <FaEdit size={14} />
-    
-  </button>
-  <button 
-    onClick={() => handleDelete(recipe.id)}
-    style={{
-      border: 'none',
-      backgroundColor: '#dc3545',
-      color: 'white',
-      padding: '6px 12px',
-      borderRadius: '4px',
-      cursor: 'pointer',
-      display: 'flex',
-      alignItems: 'center',
-      gap: '6px',
-      fontSize: '0.875rem',
-      transition: 'all 0.2s ease',
-      ':hover': {
-        backgroundColor: '#c82333',
-        transform: 'translateY(-1px)'
-      }
-    }}
-  >
-    <FaTrash size={14} />
-    
-  </button>
-</div>
+                  <div style={{ 
+                    display: 'flex', 
+                    gap: '8px', 
+                    justifyContent: 'flex-end',
+                    marginTop: 'auto'
+                  }}>
+                    <Link
+                      to={`/recipes/${recipe.id}`}
+                      style={{
+                        backgroundColor: '#6c757d',
+                        color: 'white',
+                        padding: '6px 12px',
+                        borderRadius: '4px',
+                        textDecoration: 'none',
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '6px',
+                        fontSize: '0.875rem',
+                        transition: 'all 0.2s ease',
+                        ':hover': {
+                          backgroundColor: '#5a6268',
+                          transform: 'translateY(-1px)'
+                        }
+                      }}
+                    >
+                      <FaEye size={14} />
+                      View
+                    </Link><br/>
+                    <button 
+                      onClick={() => openEditModal(recipe)}
+                      style={{
+                        border: 'none',
+                        backgroundColor: '#17a2b8',
+                        color: 'white',
+                        padding: '6px 12px',
+                        borderRadius: '4px',
+                        cursor: 'pointer',
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '6px',
+                        fontSize: '0.875rem',
+                        transition: 'all 0.2s ease',
+                        ':hover': {
+                          backgroundColor: '#138496',
+                          transform: 'translateY(-1px)'
+                        }
+                      }}
+                    >
+                      <FaEdit size={14} />
+                      
+                    </button>
+                    <button 
+                      onClick={() => handleDelete(recipe.id)}
+                      style={{
+                        border: 'none',
+                        backgroundColor: '#dc3545',
+                        color: 'white',
+                        padding: '6px 12px',
+                        borderRadius: '4px',
+                        cursor: 'pointer',
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '6px',
+                        fontSize: '0.875rem',
+                        transition: 'all 0.2s ease',
+                        ':hover': {
+                          backgroundColor: '#c82333',
+                          transform: 'translateY(-1px)'
+                        }
+                      }}
+                    >
+                      <FaTrash size={14} />
+                      
+                    </button>
+                  </div>
                 </div>
               </div>
             </div>
@@ -312,6 +336,7 @@ const MyRecipesEdit = () => {
                   <span>&times;</span>
                 </button>
               </div>
+              
               <div className="modal-body" style={{ padding: '25px' }}>
                 {['title', 'description', 'ingredients', 'steps', 'imageUrl', 'tags'].map((field, index) => (
                   <div className="form-group mb-4" key={index} style={{ marginBottom: '20px' }}>

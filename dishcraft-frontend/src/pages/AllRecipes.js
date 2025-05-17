@@ -182,256 +182,98 @@ const MyRecipes = () => {
     .catch(err => console.error('Error deleting comment:', err));
   };
 
-  if (loading) return (
-    <div style={{
-      display: 'flex',
-      justifyContent: 'center',
-      alignItems: 'center',
-      height: '100vh',
-      fontSize: '1.5rem',
-      color: '#666'
-    }}>
-      Loading recipes...
-    </div>
-  );
+  if (loading) {
+    return (
+      <div className="loading-container">
+        Loading recipes...
+      </div>
+    );
+  }
 
   return (
-    <div style={{
-      maxWidth: '1200px',
-      margin: '0 auto',
-      padding: '20px',
-      backgroundColor: '#f8f9fa',
-      minHeight: '100vh'
-    }}>
-      <div style={{
-        display: 'flex',
-        justifyContent: 'space-between',
-        alignItems: 'center',
-        marginBottom: '30px',
-        paddingBottom: '15px',
-        borderBottom: '1px solid #dee2e6'
-      }}>
-        <h2 style={{
-          color: '#343a40',
-          fontWeight: '600',
-          margin: 0
-        }}></h2>
-        <Link 
-          to="/add" 
-          style={{
-            backgroundColor: '#28a745',
-            color: 'white',
-            padding: '8px 16px',
-            borderRadius: '4px',
-            textDecoration: 'none',
-            fontWeight: '500',
-            display: 'inline-flex',
-            alignItems: 'center',
-            gap: '8px',
-            transition: 'all 0.3s',
-            ':hover': {
-              backgroundColor: '#218838',
-              transform: 'translateY(-2px)'
-            }
-          }}
-        >
+    <div className="my-recipes-container">
+      <div className="header-section">
+        <h2>My Recipes</h2>
+        <Link to="/add" className="add-recipe-button">
           Add New Recipe
         </Link>
       </div>
 
       {recipes.length === 0 && (
-        <div style={{
-          textAlign: 'center',
-          padding: '40px',
-          backgroundColor: 'white',
-          borderRadius: '8px',
-          boxShadow: '0 2px 8px rgba(0,0,0,0.1)'
-        }}>
-          <p style={{ fontSize: '1.2rem', color: '#6c757d' }}>No recipes found. Create your first recipe!</p>
+        <div className="empty-state">
+          <p>No recipes found. Create your first recipe!</p>
         </div>
       )}
 
-      <div style={{
-        display: 'grid',
-        gridTemplateColumns: 'repeat(auto-fill, minmax(500px, 1fr))',
-        gap: '25px',
-        marginTop: '20px'
-      }}>
+      <div className="recipes-grid">
         {recipes.map((recipe) => (
-          <div key={recipe.id} style={{
-            backgroundColor: 'white',
-            borderRadius: '10px',
-            overflow: 'hidden',
-            boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
-            transition: 'transform 0.3s, box-shadow 0.3s',
-            ':hover': {
-              transform: 'translateY(-5px)',
-              boxShadow: '0 6px 16px rgba(0,0,0,0.15)'
-            }
-          }}>
-            <div style={{ display: 'flex', height: '100%' }}>
+          <div key={recipe.id} className="recipe-card">
+            <div className="recipe-content">
               {recipe.imageUrl && (
-                <div style={{
-                  width: '40%',
-                  minHeight: '300px',
-                  overflow: 'hidden'
-                }}>
+                <div className="recipe-image-container">
                   <img
                     src={recipe.imageUrl}
                     alt={recipe.title}
-                    style={{
-                      width: '100%',
-                      height: '100%',
-                      objectFit: 'cover',
-                      objectPosition: 'center'
-                    }}
+                    className="recipe-image"
                   />
                 </div>
               )}
               
-              <div style={{
-                width: recipe.imageUrl ? '60%' : '100%',
-                padding: '20px',
-                display: 'flex',
-                flexDirection: 'column'
-              }}>
-                <h3 style={{
-                  margin: '0 0 10px 0',
-                  color: '#212529',
-                  fontSize: '1.5rem',
-                  fontWeight: '600'
-                }}>
-                  {recipe.title}
-                </h3>
+              <div className={`recipe-details ${recipe.imageUrl ? 'with-image' : 'full-width'}`}>
+                <h3 className="recipe-title">{recipe.title}</h3>
                 
-                <p style={{
-                  color: '#495057',
-                  fontSize: '0.95rem',
-                  marginBottom: '15px',
-                  flexGrow: 1
-                }}>
+                <p className="recipe-description">
                   {recipe.description?.substring(0, 150)}...
                 </p>
 
-                <div style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  marginBottom: '15px',
-                  gap: '10px'
-                }}>
+                <div className="like-section">
                   <button 
                     onClick={() => handleLike(recipe.id)} 
-                    style={{
-                      border: 'none',
-                      background: 'transparent',
-                      cursor: 'pointer',
-                      padding: '5px',
-                      borderRadius: '50%',
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      transition: 'all 0.2s',
-                      ':hover': {
-                        backgroundColor: 'rgba(220, 53, 69, 0.1)'
-                      }
-                    }}
+                    className="like-button"
                   >
                     {likes[recipe.id]?.isLiked ? (
-                      <FaHeart style={{ color: '#dc3545', fontSize: '1.2rem' }} />
+                      <FaHeart className="liked-icon" />
                     ) : (
-                      <FaRegHeart style={{ color: '#6c757d', fontSize: '1.2rem' }} />
+                      <FaRegHeart className="not-liked-icon" />
                     )}
                   </button>
-                  <span style={{ color: '#6c757d', fontSize: '0.9rem' }}>
+                  <span className="like-count">
                     {likes[recipe.id]?.count || 0} likes
                   </span>
                 </div>
 
-                <div style={{ marginBottom: '15px' }}>
-                  <div style={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    marginBottom: '10px',
-                    color: '#495057',
-                    gap: '8px'
-                  }}>
-                    <FaComment style={{ color: '#6c757d' }} />
-                    <span style={{ fontWeight: '500' }}>
-                      Comments ({comments[recipe.id]?.length || 0})
-                    </span>
+                <div className="comments-section">
+                  <div className="comments-header">
+                    <FaComment className="comment-icon" />
+                    <span>Comments ({comments[recipe.id]?.length || 0})</span>
                   </div>
                   
-                  <div style={{
-                    maxHeight: '150px',
-                    overflowY: 'auto',
-                    padding: '10px',
-                    backgroundColor: '#f8f9fa',
-                    borderRadius: '6px',
-                    marginBottom: '10px'
-                  }}>
+                  <div className="comments-list">
                     {comments[recipe.id]?.length > 0 ? (
                       comments[recipe.id].map(comment => (
-                        <div key={comment.id} style={{
-                          marginBottom: '12px',
-                          paddingBottom: '12px',
-                          borderBottom: '1px solid #e9ecef'
-                        }}>
-                          <div style={{
-                            display: 'flex',
-                            justifyContent: 'space-between',
-                            marginBottom: '5px'
-                          }}>
-                            <strong style={{ color: '#212529' }}>{comment.username}</strong>
-                            <small style={{ color: '#6c757d' }}>{comment.createdAt}</small>
+                        <div key={comment.id} className="comment-item">
+                          <div className="comment-header">
+                            <strong>{comment.username}</strong>
+                            <small>{comment.createdAt}</small>
                           </div>
 
                           {editingComment.id === comment.id ? (
                             <>
                               <input
                                 type="text"
-                                style={{
-                                  width: '100%',
-                                  padding: '6px 10px',
-                                  border: '1px solid #ced4da',
-                                  borderRadius: '4px',
-                                  marginBottom: '8px'
-                                }}
+                                className="comment-edit-input"
                                 value={editingComment.text}
                                 onChange={(e) => setEditingComment({ ...editingComment, text: e.target.value })}
                               />
-                              <div style={{
-                                display: 'flex',
-                                justifyContent: 'flex-end',
-                                gap: '8px'
-                              }}>
+                              <div className="comment-edit-actions">
                                 <button 
-                                  style={{
-                                    border: 'none',
-                                    backgroundColor: '#28a745',
-                                    color: 'white',
-                                    padding: '4px 8px',
-                                    borderRadius: '4px',
-                                    cursor: 'pointer',
-                                    display: 'flex',
-                                    alignItems: 'center',
-                                    gap: '4px'
-                                  }}
+                                  className="save-edit-button"
                                   onClick={() => handleUpdateComment(recipe.id, comment.id)}
                                 >
                                   <FaCheck size={12} /> Save
                                 </button>
                                 <button 
-                                  style={{
-                                    border: 'none',
-                                    backgroundColor: '#6c757d',
-                                    color: 'white',
-                                    padding: '4px 8px',
-                                    borderRadius: '4px',
-                                    cursor: 'pointer',
-                                    display: 'flex',
-                                    alignItems: 'center',
-                                    gap: '4px'
-                                  }}
+                                  className="cancel-edit-button"
                                   onClick={cancelEditing}
                                 >
                                   <FaTimes size={12} /> Cancel
@@ -440,47 +282,17 @@ const MyRecipes = () => {
                             </>
                           ) : (
                             <>
-                              <p style={{ 
-                                margin: '0 0 8px 0',
-                                color: '#495057',
-                                fontSize: '0.9rem'
-                              }}>
-                                {comment.text}
-                              </p>
+                              <p className="comment-text">{comment.text}</p>
                               {comment.userId === userId && (
-                                <div style={{
-                                  display: 'flex',
-                                  justifyContent: 'flex-end',
-                                  gap: '8px'
-                                }}>
+                                <div className="comment-actions">
                                   <button 
-                                    style={{
-                                      border: 'none',
-                                      backgroundColor: '#17a2b8',
-                                      color: 'white',
-                                      padding: '4px 8px',
-                                      borderRadius: '4px',
-                                      cursor: 'pointer',
-                                      display: 'flex',
-                                      alignItems: 'center',
-                                      gap: '4px'
-                                    }}
+                                    className="edit-comment-button"
                                     onClick={() => startEditingComment(comment)}
                                   >
                                     <FaEdit size={12} /> 
                                   </button>
                                   <button 
-                                    style={{
-                                      border: 'none',
-                                      backgroundColor: '#dc3545',
-                                      color: 'white',
-                                      padding: '4px 8px',
-                                      borderRadius: '4px',
-                                      cursor: 'pointer',
-                                      display: 'flex',
-                                      alignItems: 'center',
-                                      gap: '4px'
-                                    }}
+                                    className="delete-comment-button"
                                     onClick={() => handleDeleteComment(recipe.id, comment.id)}
                                   >
                                     <FaTrash size={12} /> 
@@ -492,49 +304,22 @@ const MyRecipes = () => {
                         </div>
                       ))
                     ) : (
-                      <p style={{ 
-                        color: '#6c757d',
-                        fontSize: '0.9rem',
-                        textAlign: 'center',
-                        margin: '10px 0'
-                      }}>
+                      <p className="no-comments-message">
                         No comments yet. Be the first to comment!
                       </p>
                     )}
                   </div>
 
-                  <div style={{
-                    display: 'flex',
-                    gap: '10px',
-                    marginTop: '10px'
-                  }}>
+                  <div className="add-comment-section">
                     <input
                       type="text"
                       placeholder="Add a comment..."
-                      style={{
-                        flexGrow: 1,
-                        padding: '8px 12px',
-                        border: '1px solid #ced4da',
-                        borderRadius: '4px',
-                        fontSize: '0.9rem'
-                      }}
+                      className="comment-input"
                       value={newComments[recipe.id] || ''}
                       onChange={(e) => setNewComments(prev => ({ ...prev, [recipe.id]: e.target.value }))}
                     />
                     <button 
-                      style={{
-                        border: 'none',
-                        backgroundColor: '#007bff',
-                        color: 'white',
-                        padding: '8px 16px',
-                        borderRadius: '4px',
-                        cursor: 'pointer',
-                        fontWeight: '500',
-                        transition: 'background-color 0.2s',
-                        ':hover': {
-                          backgroundColor: '#0069d9'
-                        }
-                      }}
+                      className="post-comment-button"
                       onClick={() => handleAddComment(recipe.id)}
                     >
                       Post
@@ -542,30 +327,364 @@ const MyRecipes = () => {
                   </div>
                 </div>
 
-                <div style={{ marginTop: 'auto', display: 'flex', justifyContent: 'flex-end' }}>
+                <div className="view-details-button-container">
                   <Link 
-                    to={`/MyRecipes/${recipe.id}`}
-                    style={{
-                      backgroundColor: '#6c757d',
-                      color: 'white',
-                      padding: '8px 16px',
-                      borderRadius: '4px',
-                      textDecoration: 'none',
-                      fontSize: '0.9rem',
-                      transition: 'all 0.2s',
-                      ':hover': {
-                        backgroundColor: '#5a6268'
-                      }
-                    }}
+                    to={`/recipes/${recipe.id}`}
+                    className="view-details-button"
                   >
                     View Details
                   </Link>
+                  
                 </div>
               </div>
             </div>
           </div>
         ))}
       </div>
+
+      <style jsx>{`
+        .my-recipes-container {
+          max-width: 1200px;
+          margin: 0 auto;
+          padding: 20px;
+          background-color: #f8f9fa;
+          min-height: 100vh;
+        }
+
+        .loading-container {
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          height: 100vh;
+          font-size: 1.5rem;
+          color: #666;
+        }
+
+        .header-section {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          margin-bottom: 30px;
+          padding-bottom: 15px;
+          border-bottom: 1px solid #dee2e6;
+        }
+
+        .header-section h2 {
+          color: #343a40;
+          font-weight: 600;
+          margin: 0;
+        }
+
+        .add-recipe-button {
+          background-color: #28a745;
+          color: white;
+          padding: 8px 16px;
+          border-radius: 4px;
+          text-decoration: none;
+          font-weight: 500;
+          display: inline-flex;
+          align-items: center;
+          gap: 8px;
+          transition: all 0.3s;
+        }
+
+        .add-recipe-button:hover {
+          background-color: #218838;
+          transform: translateY(-2px);
+        }
+
+        .empty-state {
+          text-align: center;
+          padding: 40px;
+          background-color: white;
+          border-radius: 8px;
+          box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .empty-state p {
+          font-size: 1.2rem;
+          color: #6c757d;
+        }
+
+        .recipes-grid {
+          display: grid;
+          grid-template-columns: repeat(auto-fill, minmax(500px, 1fr));
+          gap: 25px;
+          margin-top: 20px;
+        }
+
+        .recipe-card {
+          background-color: white;
+          border-radius: 10px;
+          overflow: hidden;
+          box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+          transition: transform 0.3s, box-shadow 0.3s;
+        }
+
+        .recipe-card:hover {
+          transform: translateY(-5px);
+          box-shadow: 0 6px 16px rgba(0,0,0,0.15);
+        }
+
+        .recipe-content {
+          display: flex;
+          height: 100%;
+        }
+
+        .recipe-image-container {
+          width: 40%;
+          min-height: 300px;
+          overflow: hidden;
+        }
+
+        .recipe-image {
+          width: 100%;
+          height: 100%;
+          object-fit: cover;
+          object-position: center;
+        }
+
+        .recipe-details {
+          padding: 20px;
+          display: flex;
+          flex-direction: column;
+        }
+
+        .recipe-details.with-image {
+          width: 60%;
+        }
+
+        .recipe-details.full-width {
+          width: 100%;
+        }
+
+        .recipe-title {
+          margin: 0 0 10px 0;
+          color: #212529;
+          font-size: 1.5rem;
+          font-weight: 600;
+        }
+
+        .recipe-description {
+          color: #495057;
+          font-size: 0.95rem;
+          margin-bottom: 15px;
+          flex-grow: 1;
+        }
+
+        .like-section {
+          display: flex;
+          align-items: center;
+          margin-bottom: 15px;
+          gap: 10px;
+        }
+
+        .like-button {
+          border: none;
+          background: transparent;
+          cursor: pointer;
+          padding: 5px;
+          border-radius: 50%;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          transition: all 0.2s;
+        }
+
+        .like-button:hover {
+          background-color: rgba(220, 53, 69, 0.1);
+        }
+
+        .liked-icon {
+          color: #dc3545;
+          font-size: 1.2rem;
+        }
+
+        .not-liked-icon {
+          color: #6c757d;
+          font-size: 1.2rem;
+        }
+
+        .like-count {
+          color: #6c757d;
+          font-size: 0.9rem;
+        }
+
+        .comments-section {
+          margin-bottom: 15px;
+        }
+
+        .comments-header {
+          display: flex;
+          align-items: center;
+          margin-bottom: 10px;
+          color: #495057;
+          gap: 8px;
+        }
+
+        .comment-icon {
+          color: #6c757d;
+        }
+
+        .comments-list {
+          max-height: 150px;
+          overflow-y: auto;
+          padding: 10px;
+          background-color: #f8f9fa;
+          border-radius: 6px;
+          margin-bottom: 10px;
+        }
+
+        .comment-item {
+          margin-bottom: 12px;
+          padding-bottom: 12px;
+          border-bottom: 1px solid #e9ecef;
+        }
+
+        .comment-header {
+          display: flex;
+          justify-content: space-between;
+          margin-bottom: 5px;
+        }
+
+        .comment-header strong {
+          color: #212529;
+        }
+
+        .comment-header small {
+          color: #6c757d;
+        }
+
+        .comment-text {
+          margin: 0 0 8px 0;
+          color: #495057;
+          font-size: 0.9rem;
+        }
+
+        .comment-edit-input {
+          width: 100%;
+          padding: 6px 10px;
+          border: 1px solid #ced4da;
+          border-radius: 4px;
+          margin-bottom: 8px;
+        }
+
+        .comment-edit-actions {
+          display: flex;
+          justify-content: flex-end;
+          gap: 8px;
+        }
+
+        .save-edit-button {
+          border: none;
+          background-color: #28a745;
+          color: white;
+          padding: 4px 8px;
+          border-radius: 4px;
+          cursor: pointer;
+          display: flex;
+          align-items: center;
+          gap: 4px;
+        }
+
+        .cancel-edit-button {
+          border: none;
+          background-color: #6c757d;
+          color: white;
+          padding: 4px 8px;
+          border-radius: 4px;
+          cursor: pointer;
+          display: flex;
+          align-items: center;
+          gap: 4px;
+        }
+
+        .comment-actions {
+          display: flex;
+          justify-content: flex-end;
+          gap: 8px;
+        }
+
+        .edit-comment-button {
+          border: none;
+          background-color: #17a2b8;
+          color: white;
+          padding: 4px 8px;
+          border-radius: 4px;
+          cursor: pointer;
+          display: flex;
+          align-items: center;
+          gap: 4px;
+        }
+
+        .delete-comment-button {
+          border: none;
+          background-color: #dc3545;
+          color: white;
+          padding: 4px 8px;
+          border-radius: 4px;
+          cursor: pointer;
+          display: flex;
+          align-items: center;
+          gap: 4px;
+        }
+
+        .no-comments-message {
+          color: #6c757d;
+          font-size: 0.9rem;
+          text-align: center;
+          margin: 10px 0;
+        }
+
+        .add-comment-section {
+          display: flex;
+          gap: 10px;
+          margin-top: 10px;
+        }
+
+        .comment-input {
+          flex-grow: 1;
+          padding: 8px 12px;
+          border: 1px solid #ced4da;
+          border-radius: 4px;
+          font-size: 0.9rem;
+        }
+
+        .post-comment-button {
+          border: none;
+          background-color: #007bff;
+          color: white;
+          padding: 8px 16px;
+          border-radius: 4px;
+          cursor: pointer;
+          font-weight: 500;
+          transition: background-color 0.2s;
+        }
+
+        .post-comment-button:hover {
+          background-color: #0069d9;
+        }
+
+        .view-details-button-container {
+          margin-top: auto;
+          display: flex;
+          justify-content: flex-end;
+        }
+
+        .view-details-button {
+          background-color: #6c757d;
+          color: white;
+          padding: 8px 16px;
+          border-radius: 4px;
+          text-decoration: none;
+          font-size: 0.9rem;
+          transition: all 0.2s;
+        }
+
+        .view-details-button:hover {
+          background-color: #5a6268;
+        }
+      `}</style>
     </div>
   );
 };
