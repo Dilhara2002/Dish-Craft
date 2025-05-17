@@ -105,7 +105,7 @@ const MyRecipesEdit = () => {
           fontWeight: '600',
           fontSize: '2rem',
           margin: '0'
-        }}>My Recipes</h2>
+        }}></h2>
         <Link 
           to="/add" 
           style={{

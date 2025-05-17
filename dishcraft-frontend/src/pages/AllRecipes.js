@@ -193,7 +193,7 @@ const MyRecipes = () => {
   return (
     <div className="my-recipes-container">
       <div className="header-section">
-        <h2>My Recipes</h2>
+        <h2></h2>
         <Link to="/add" className="add-recipe-button">
           Add New Recipe
         </Link>
