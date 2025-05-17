@@ -3,7 +3,7 @@ import axios from 'axios';
 import { Link } from 'react-router-dom';
 import { 
   FaHeart, FaRegHeart, FaComment, FaEdit, 
-  FaTrash, FaCheck, FaTimes, FaPlus, FaTimes as FaClose
+  FaTrash, FaCheck, FaTimes, FaPlus, FaTimes as FaClose, FaEye
 } from 'react-icons/fa';
 import moment from 'moment';
 import 'bootstrap/dist/css/bootstrap.min.css';
@@ -410,6 +410,277 @@ const CommentModal = ({ show, onClose, recipeId, recipeTitle, comments, username
   );
 };
 
+// Edit Modal Component with enhanced image styling
+const EditModal = ({ show, onClose, recipe, onUpdate }) => {
+  const [editForm, setEditForm] = useState({
+    title: '',
+    description: '',
+    ingredients: '',
+    steps: '',
+    imageUrl: '',
+    tags: ''
+  });
+
+  useEffect(() => {
+    if (recipe) {
+      setEditForm({
+        title: recipe.title,
+        description: recipe.description,
+        ingredients: recipe.ingredients?.join(', ') || '',
+        steps: recipe.instructions?.join('. ') || '',
+        imageUrl: recipe.imageUrl || '',
+        tags: recipe.tags?.join(', ') || ''
+      });
+    }
+  }, [recipe]);
+
+  const handleChange = (e) => {
+    setEditForm({ ...editForm, [e.target.name]: e.target.value });
+  };
+
+  const handleSubmit = () => {
+    const updatedRecipe = {
+      ...recipe,
+      title: editForm.title,
+      description: editForm.description,
+      ingredients: editForm.ingredients.split(',').map(i => i.trim()),
+      instructions: editForm.steps.split('.').map(s => s.trim()).filter(s => s),
+      imageUrl: editForm.imageUrl,
+      tags: editForm.tags ? editForm.tags.split(',').map(t => t.trim()) : []
+    };
+    onUpdate(updatedRecipe);
+    onClose();
+  };
+
+  if (!show) return null;
+
+  return (
+    <div className="modal-backdrop">
+      <div className="modal-container" onClick={(e) => e.stopPropagation()}>
+        <div className="modal-content" style={{ maxWidth: '800px' }}>
+          <div className="modal-header" style={{
+            background: 'linear-gradient(135deg, #3498db, #2980b9)',
+            color: 'white'
+          }}>
+            <h5 className="modal-title">Edit Recipe</h5>
+            <button className="close-button" onClick={onClose}>
+              <FaClose />
+            </button>
+          </div>
+          
+          <div className="modal-body">
+            {/* Enhanced Image Preview Section */}
+            {editForm.imageUrl && (
+              <div className="mb-4">
+                <div 
+                  className="image-preview-container"
+                  style={{
+                    borderRadius: '8px',
+                    overflow: 'hidden',
+                    boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
+                    marginBottom: '16px',
+                    border: '1px solid #dee2e6',
+                    backgroundColor: '#f8f9fa'
+                  }}
+                >
+                  <img
+                    src={editForm.imageUrl}
+                    alt="Recipe preview"
+                    className="img-fluid"
+                    style={{
+                      width: '100%',
+                      maxHeight: '300px',
+                      objectFit: 'cover',
+                      display: 'block'
+                    }}
+                  />
+                </div>
+                <small className="text-muted d-block text-center">
+                  Current image preview
+                </small>
+              </div>
+            )}
+            
+            {['title', 'description', 'ingredients', 'steps', 'imageUrl', 'tags'].map((field) => (
+              <div className="form-group mb-4" key={field}>
+                <label>{field.charAt(0).toUpperCase() + field.slice(1)}</label>
+                {field === 'description' || field === 'steps' ? (
+                  <textarea
+                    className="form-control"
+                    name={field}
+                    value={editForm[field]}
+                    onChange={handleChange}
+                    rows={field === 'steps' ? 5 : 3}
+                  />
+                ) : (
+                  <input
+                    type="text"
+                    className="form-control"
+                    name={field}
+                    value={editForm[field]}
+                    onChange={handleChange}
+                  />
+                )}
+              </div>
+            ))}
+          </div>
+          
+          <div className="modal-footer">
+            <button 
+              className="btn btn-secondary" 
+              onClick={onClose}
+            >
+              Cancel
+            </button>
+            <button 
+              className="btn btn-primary"
+              onClick={handleSubmit}
+            >
+              Update Recipe
+            </button>
+          </div>
+        </div>
+      </div>
+      
+      <style jsx>{`
+        .modal-backdrop {
+          position: fixed;
+          top: 0;
+          left: 0;
+          width: 100%;
+          height: 100%;
+          background-color: rgba(0, 0, 0, 0.6);
+          z-index: 1050;
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          animation: fadeIn 0.2s ease-out;
+        }
+        
+        .modal-container {
+          width: 90%;
+          max-width: 800px;
+          max-height: 90vh;
+          background-color: white;
+          border-radius: 12px;
+          overflow: hidden;
+          box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+          animation: slideIn 0.3s ease-out;
+        }
+        
+        .modal-content {
+          display: flex;
+          flex-direction: column;
+          height: 100%;
+          max-height: 90vh;
+        }
+        
+        .modal-header {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          padding: 16px 20px;
+          border-bottom: 1px solid rgba(255,255,255,0.2);
+        }
+        
+        .modal-title {
+          font-weight: 600;
+          margin: 0;
+          font-size: 1.25rem;
+        }
+        
+        .close-button {
+          background: none;
+          border: none;
+          font-size: 20px;
+          cursor: pointer;
+          color: white;
+          padding: 0;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          opacity: 0.8;
+          transition: opacity 0.2s;
+        }
+        
+        .close-button:hover {
+          opacity: 1;
+        }
+        
+        .modal-body {
+          padding: 20px;
+          overflow-y: auto;
+          flex: 1;
+        }
+        
+        .form-group label {
+          font-weight: 500;
+          margin-bottom: 8px;
+          display: block;
+        }
+        
+        .form-control {
+          border-radius: 6px;
+          border: 1px solid #ced4da;
+          padding: 10px 12px;
+          transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+        }
+        
+        .form-control:focus {
+          border-color: #80bdff;
+          outline: 0;
+          box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+        }
+        
+        .modal-footer {
+          padding: 16px 20px;
+          border-top: 1px solid #dee2e6;
+          display: flex;
+          justify-content: flex-end;
+          gap: 10px;
+        }
+        
+        .btn {
+          padding: 8px 16px;
+          border-radius: 6px;
+          font-weight: 500;
+          transition: all 0.2s ease;
+        }
+        
+        .btn-secondary {
+          background-color: #6c757d;
+          border-color: #6c757d;
+        }
+        
+        .btn-secondary:hover {
+          background-color: #5a6268;
+          border-color: #545b62;
+        }
+        
+        .btn-primary {
+          background-color: #3498db;
+          border-color: #3498db;
+        }
+        
+        .btn-primary:hover {
+          background-color: #2980b9;
+          border-color: #2980b9;
+        }
+        
+        @keyframes fadeIn {
+          from { opacity: 0; }
+          to { opacity: 1; }
+        }
+        
+        @keyframes slideIn {
+          from { transform: translateY(30px); opacity: 0; }
+          to { transform: translateY(0); opacity: 1; }
+        }
+      `}</style>
+    </div>
+  );
+};
+
 const MyRecipes = () => {
   const [recipes, setRecipes] = useState([]);
   const [comments, setComments] = useState({});
@@ -418,6 +689,8 @@ const MyRecipes = () => {
   const [editingComment, setEditingComment] = useState({ id: null, text: '' });
   const [loading, setLoading] = useState(true);
   const [activeCommentModal, setActiveCommentModal] = useState(null);
+  const [editingRecipe, setEditingRecipe] = useState(null);
+  const [showEditModal, setShowEditModal] = useState(false);
 
   const token = localStorage.getItem('token');
   const userId = localStorage.getItem('userId');
@@ -596,6 +869,28 @@ const MyRecipes = () => {
     .catch(err => console.error('Error deleting comment:', err));
   };
 
+  const handleDeleteRecipe = (recipeId) => {
+    if (window.confirm("Are you sure you want to delete this recipe?")) {
+      axios.delete(`http://localhost:8080/api/recipes/${recipeId}`, {
+        headers: { Authorization: `Bearer ${token}`, userId }
+      })
+      .then(() => {
+        setRecipes(prev => prev.filter(recipe => recipe.id !== recipeId));
+      })
+      .catch(err => console.error('Error deleting recipe:', err));
+    }
+  };
+
+  const handleUpdateRecipe = (updatedRecipe) => {
+    axios.put(`http://localhost:8080/api/recipes/${updatedRecipe.id}`, updatedRecipe, {
+      headers: { Authorization: `Bearer ${token}`, userId }
+    })
+    .then(res => {
+      setRecipes(prev => prev.map(r => r.id === updatedRecipe.id ? res.data : r));
+    })
+    .catch(err => console.error('Error updating recipe:', err));
+  };
+
   // Modal handlers for comments
   const openCommentModal = (recipeId) => {
     const recipe = recipes.find(r => r.id === recipeId);
@@ -742,8 +1037,41 @@ const MyRecipes = () => {
                   </div>
                 )}
                 
-                {/* Action buttons */}
+                {/* Edit/Delete buttons */}
                 <div className="card-body p-3 pt-2 pb-0">
+                  <div className="d-flex justify-content-end mb-2">
+                    <div style={{ display: 'flex', gap: '8px' }}>
+                      <button
+                        onClick={() => {
+                          setEditingRecipe(recipe);
+                          setShowEditModal(true);
+                        }}
+                        className="btn btn-sm btn-primary d-flex align-items-center"
+                        style={{
+                          borderRadius: '20px',
+                          padding: '5px 10px',
+                          fontSize: '12px'
+                        }}
+                      >
+                        <FaEdit className="me-1" />
+                        Edit
+                      </button>
+                      <button
+                        onClick={() => handleDeleteRecipe(recipe.id)}
+                        className="btn btn-sm btn-danger d-flex align-items-center"
+                        style={{
+                          borderRadius: '20px',
+                          padding: '5px 10px',
+                          fontSize: '12px'
+                        }}
+                      >
+                        <FaTrash className="me-1" />
+                        Delete
+                      </button>
+                    </div>
+                  </div>
+                
+                  {/* Action buttons */}
                   <div className="d-flex gap-3 mb-2">
                     <button 
                       onClick={() => handleLike(recipe.id)} 
@@ -918,6 +1246,16 @@ const MyRecipes = () => {
           onAddComment={handleModalAddComment}
           onUpdateComment={handleModalUpdateComment}
           onDeleteComment={handleModalDeleteComment}
+        />
+      )}
+
+      {/* Edit Modal */}
+      {showEditModal && (
+        <EditModal
+          show={showEditModal}
+          onClose={() => setShowEditModal(false)}
+          recipe={editingRecipe}
+          onUpdate={handleUpdateRecipe}
         />
       )}
     </div>
