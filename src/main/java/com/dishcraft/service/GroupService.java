@@ -12,4 +12,8 @@ public interface GroupService {
     Group joinGroup(String groupId, String userId);
     void deleteGroup(String groupId);
     Group updateGroup(String id, GroupRequestDTO groupDTO);
+
 }
+
+}
+

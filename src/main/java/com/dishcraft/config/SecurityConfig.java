@@ -34,11 +34,15 @@ public class SecurityConfig {
             .cors().configurationSource(corsConfigurationSource()).and()
             .csrf().disable()
             .authorizeHttpRequests()
-            .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll() // Allow preflight requests
-            .requestMatchers("/api/auth/**").permitAll()
-            .requestMatchers("/api/recipes/**").permitAll()
+            .requestMatchers(HttpMethod.OPTIONS, "/").permitAll() // Allow preflight requests
+            .requestMatchers("/api/auth/").permitAll()
+            .requestMatchers("/api/recipes/").permitAll()
             .requestMatchers("/api/users/me").authenticated()
+
             .requestMatchers(HttpMethod.PUT, "/api/groups/**").authenticated()
+
+            .requestMatchers(HttpMethod.PUT, "/api/groups/").authenticated()
+
             .anyRequest().authenticated()
             .and()
             .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
@@ -58,7 +62,7 @@ public CorsConfigurationSource corsConfigurationSource() {
     configuration.setAllowCredentials(true);
 
     UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-    source.registerCorsConfiguration("/**", configuration);
+    source.registerCorsConfiguration("/", configuration);
     return source;
 }
 
