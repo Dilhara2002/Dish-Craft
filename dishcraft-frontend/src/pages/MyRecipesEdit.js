@@ -1,6 +1,10 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import { Link } from 'react-router-dom';
+import { FaTrash } from 'react-icons/fa';
+import { FaEdit } from 'react-icons/fa';
+
+
 
 const MyRecipesEdit = () => {
   const [myRecipes, setMyRecipes] = useState([]);
@@ -104,7 +108,7 @@ const MyRecipesEdit = () => {
           fontWeight: '600',
           fontSize: '2rem',
           margin: '0'
-        }}>My Recipes</h2>
+        }}></h2>
         <Link 
                   to="/add" 
                   style={{
@@ -200,42 +204,54 @@ const MyRecipesEdit = () => {
                   }}>
                     {recipe.description?.substring(0, 100)}...
                   </p>
-                  <div className="d-flex justify-content-between" style={{ marginTop: 'auto' }}>
-                    <button 
-                      className="btn btn-sm btn-outline-primary" 
-                      onClick={() => openEditModal(recipe)}
-                      style={{
-                        padding: '8px 15px',
-                        borderRadius: '6px',
-                        fontWeight: '500',
-                        borderWidth: '1.5px',
-                        transition: 'all 0.2s ease',
-                        ':hover': {
-                          background: '#3498db',
-                          color: 'white'
-                        }
-                      }}
-                    >
-                      Edit
-                    </button>
-                    <button 
-                      className="btn btn-sm btn-outline-danger" 
-                      onClick={() => handleDelete(recipe.id)}
-                      style={{
-                        padding: '8px 15px',
-                        borderRadius: '6px',
-                        fontWeight: '500',
-                        borderWidth: '1.5px',
-                        transition: 'all 0.2s ease',
-                        ':hover': {
-                          background: '#e74c3c',
-                          color: 'white'
-                        }
-                      }}
-                    >
-                      Delete
-                    </button>
-                  </div>
+                  <div style={{ display: 'flex', gap: '8px', justifyContent: 'flex-end' }}>
+  <button 
+    onClick={() => openEditModal(recipe)}
+    style={{
+      border: 'none',
+      backgroundColor: '#17a2b8',
+      color: 'white',
+      padding: '6px 12px',
+      borderRadius: '4px',
+      cursor: 'pointer',
+      display: 'flex',
+      alignItems: 'center',
+      gap: '6px',
+      fontSize: '0.875rem',
+      transition: 'all 0.2s ease',
+      ':hover': {
+        backgroundColor: '#138496',
+        transform: 'translateY(-1px)'
+      }
+    }}
+  >
+    <FaEdit size={14} />
+    
+  </button>
+  <button 
+    onClick={() => handleDelete(recipe.id)}
+    style={{
+      border: 'none',
+      backgroundColor: '#dc3545',
+      color: 'white',
+      padding: '6px 12px',
+      borderRadius: '4px',
+      cursor: 'pointer',
+      display: 'flex',
+      alignItems: 'center',
+      gap: '6px',
+      fontSize: '0.875rem',
+      transition: 'all 0.2s ease',
+      ':hover': {
+        backgroundColor: '#c82333',
+        transform: 'translateY(-1px)'
+      }
+    }}
+  >
+    <FaTrash size={14} />
+    
+  </button>
+</div>
                 </div>
               </div>
             </div>
