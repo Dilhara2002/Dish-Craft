@@ -71,4 +71,8 @@ public void deleteGroup(@PathVariable String groupId) {
         Group updatedGroup = groupService.updateGroup(id, groupDTO);
         return ResponseEntity.ok(updatedGroup);
     }
+
 }
+
+}
+
