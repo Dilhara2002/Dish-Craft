@@ -199,82 +199,254 @@ const MyRecipes = () => {
   return (
     <div className="bg-light min-vh-100 py-4">
       <div className="container">
-        <div className="sticky-top bg-white border-bottom shadow-sm mb-4">
-          <div className="container d-flex justify-content-between align-items-center py-3">
-            <h2 className="h4 mb-0 fw-bold text-primary">My Recipes</h2>
+        {/* Sticky header with app name and add button */}
+        <div className="sticky-top bg-white border-bottom shadow-sm mb-4 py-3" style={{ zIndex: 1000 }}>
+          <div className="container d-flex justify-content-between align-items-center">
+            <h4 className="mb-0" style={{ fontFamily: 'cursive', color: '#ff6b6b' }}></h4>
             <Link 
               to="/add" 
-              className="btn btn-primary rounded-circle p-2"
-              title="Add New Recipe"
+              className="btn btn-primary d-flex align-items-center"
+              style={{
+                borderRadius: '20px',
+                padding: '8px 16px',
+                fontWeight: '600',
+                boxShadow: '0 2px 4px rgba(0,0,0,0.1)'
+              }}
             >
-              <FaPlus />
+              <FaPlus className="me-1" />
+              Add Recipe
             </Link>
           </div>
         </div>
 
         {recipes.length === 0 && (
-          <div className="card text-center p-5 mb-4">
+          <div className="card text-center p-5 mb-4" style={{ borderRadius: '15px' }}>
             <div className="card-body">
               <h5 className="card-title">No recipes found</h5>
               <p className="card-text text-muted">You haven't created any recipes yet.</p>
-              <Link to="/add" className="btn btn-primary">
+              <Link 
+                to="/add" 
+                className="btn btn-primary"
+                style={{
+                  borderRadius: '20px',
+                  padding: '8px 20px',
+                  fontWeight: '600'
+                }}
+              >
                 Add New Recipe
               </Link>
             </div>
           </div>
         )}
 
-        <div className="d-flex flex-column align-items-center">
+        {/* Recipe cards grid - 2 per row */}
+        <div className="row row-cols-1 row-cols-md-2 g-4">
           {recipes.map((recipe) => (
-            <div key={recipe.id} className="card mb-4 border-0 shadow-sm" style={{ maxWidth: "600px", width: "100%" }}>
-              <div className="card-header bg-white d-flex align-items-center p-3 border-0">
-                <div className="rounded-circle bg-secondary text-white d-flex align-items-center justify-content-center me-2" style={{ width: "40px", height: "40px" }}>
-                  {recipe.username?.charAt(0).toUpperCase() || "U"}
-                </div>
-                <div>
-                  <h6 className="mb-0 fw-bold">{recipe.username || "User"}</h6>
-                </div>
-              </div>
-
-              {recipe.imageUrl && (
-                <div className="position-relative" style={{ paddingBottom: "100%", overflow: "hidden" }}>
-                  <img
-                    src={recipe.imageUrl}
-                    alt={recipe.title}
-                    className="position-absolute top-0 start-0 w-100 h-100 object-fit-cover"
-                  />
-                </div>
-              )}
-
-              <div className="card-body p-3 pt-2">
-                <div className="d-flex gap-3 mb-2">
-                  <button 
-                    onClick={() => handleLike(recipe.id)} 
-                    className="btn btn-link p-0 border-0"
+            <div key={recipe.id} className="col">
+              <div 
+                className="card h-100 border-0 shadow-sm" 
+                style={{ 
+                  borderRadius: '12px',
+                  overflow: 'hidden',
+                  transition: 'transform 0.3s ease',
+                  ':hover': {
+                    transform: 'translateY(-5px)'
+                  }
+                }}
+              >
+                {/* Card header with user info */}
+                <div className="card-header bg-white d-flex align-items-center p-3 border-0">
+                  <div 
+                    className="rounded-circle bg-secondary text-white d-flex align-items-center justify-content-center me-2" 
+                    style={{ 
+                      width: "40px", 
+                      height: "40px",
+                      backgroundColor: '#ff6b6b',
+                      fontSize: '18px',
+                      fontWeight: 'bold'
+                    }}
                   >
-                    {likes[recipe.id]?.isLiked ? (
-                      <FaHeart className="fs-4 text-danger" />
-                    ) : (
-                      <FaRegHeart className="fs-4" />
+                    {recipe.username?.charAt(0).toUpperCase() || "U"}
+                  </div>
+                  <div>
+                    <h6 className="mb-0 fw-bold">{recipe.username || "User"}</h6>
+                    <small className="text-muted">{moment(recipe.createdAt).fromNow()}</small>
+                  </div>
+                </div>
+                
+                {/* Image container */}
+                {recipe.imageUrl && (
+                  <div 
+                    className="position-relative" 
+                    style={{ 
+                      paddingBottom: "75%", 
+                      overflow: "hidden",
+                      backgroundColor: '#f8f9fa'
+                    }}
+                  >
+                    <img
+                      src={recipe.imageUrl}
+                      alt={recipe.title}
+                      className="position-absolute top-0 start-0 w-100 h-100 object-fit-cover"
+                      style={{ objectPosition: 'center' }}
+                    />
+                  </div>
+                )}
+                
+                {/* Action buttons */}
+                <div className="card-body p-3 pt-2 pb-0">
+                  <div className="d-flex gap-3 mb-2">
+                    <button 
+                      onClick={() => handleLike(recipe.id)} 
+                      className="btn btn-link p-0 border-0"
+                      style={{ color: likes[recipe.id]?.isLiked ? '#ff6b6b' : '#495057' }}
+                    >
+                      {likes[recipe.id]?.isLiked ? (
+                        <FaHeart className="fs-4" />
+                      ) : (
+                        <FaRegHeart className="fs-4" />
+                      )}
+                    </button>
+                    <Link 
+                      to={`/recipes/${recipe.id}`} 
+                      className="btn btn-link p-0 border-0"
+                      style={{ color: '#495057' }}
+                    >
+                      <FaComment className="fs-4" />
+                    </Link>
+                  </div>
+                  
+                  {/* Likes count */}
+                  <div className="mb-1">
+                    <p className="fw-bold mb-0" style={{ color: '#212529' }}>
+                      {likes[recipe.id]?.count || 0} likes
+                    </p>
+                  </div>
+                  
+                  {/* Recipe title and description */}
+                  <div className="mb-2">
+                    <h5 className="mb-1" style={{ color: '#212529', fontSize: '18px' }}>
+                      {recipe.title}
+                    </h5>
+                    <p className="text-muted mb-2" style={{ fontSize: '14px' }}>
+                      {recipe.description?.substring(0, 100)}{recipe.description?.length > 100 ? '...' : ''}
+                    </p>
+                    <Link 
+                      to={`/recipes/${recipe.id}`} 
+                      className="text-decoration-none"
+                      style={{ 
+                        color: '#ff6b6b',
+                        fontSize: '14px',
+                        fontWeight: '500'
+                      }}
+                    >
+                      View Details &raquo;
+                    </Link>
+                  </div>
+                  
+                  {/* Comments section */}
+                  <div className="mt-2">
+                    {comments[recipe.id]?.length > 0 && (
+                      <div className="mb-2">
+                        <Link 
+                          to={`/recipes/${recipe.id}`} 
+                          className="text-muted text-decoration-none small"
+                          style={{ color: '#6c757d' }}
+                        >
+                          View all {comments[recipe.id].length} comments
+                        </Link>
+                        
+                        {/* Show last 2 comments */}
+                        <div className="mt-1">
+                          {comments[recipe.id].slice(-2).map(comment => (
+                            <div key={comment.id} className="d-flex mb-1 align-items-start">
+                              {editingComment.id === comment.id ? (
+                                <div className="w-100">
+                                  <div className="input-group mb-1">
+                                    <input
+                                      type="text"
+                                      className="form-control form-control-sm"
+                                      value={editingComment.text}
+                                      onChange={(e) => setEditingComment({ ...editingComment, text: e.target.value })}
+                                      style={{ borderRadius: '20px' }}
+                                    />
+                                    <button 
+                                      className="btn btn-success btn-sm ms-1"
+                                      onClick={() => handleUpdateComment(recipe.id, comment.id)}
+                                      style={{ borderRadius: '20px' }}
+                                    >
+                                      <FaCheck />
+                                    </button>
+                                    <button 
+                                      className="btn btn-secondary btn-sm ms-1"
+                                      onClick={cancelEditing}
+                                      style={{ borderRadius: '20px' }}
+                                    >
+                                      <FaTimes />
+                                    </button>
+                                  </div>
+                                </div>
+                              ) : (
+                                <>
+                                  <p className="mb-0" style={{ fontSize: '14px' }}>
+                                    <span className="fw-bold me-2" style={{ color: '#212529' }}>{comment.username}</span>
+                                    <span style={{ color: '#495057' }}>{comment.text}</span>
+                                  </p>
+                                  
+                                  {comment.userId === userId && (
+                                    <div className="ms-auto d-flex">
+                                      <button 
+                                        className="btn btn-link text-secondary p-0 me-2 border-0"
+                                        onClick={() => startEditingComment(comment)}
+                                        style={{ fontSize: '12px' }}
+                                      >
+                                        <FaEdit />
+                                      </button>
+                                      <button 
+                                        className="btn btn-link text-danger p-0 border-0"
+                                        onClick={() => handleDeleteComment(recipe.id, comment.id)}
+                                        style={{ fontSize: '12px' }}
+                                      >
+                                        <FaTrash />
+                                      </button>
+                                    </div>
+                                  )}
+                                </>
+                              )}
+                            </div>
+                          ))}
+                        </div>
+                      </div>
                     )}
-                  </button>
-                  <Link to={`/recipes/${recipe.id}`} className="btn btn-link p-0 border-0">
-                    <FaComment className="fs-4" />
-                  </Link>
-                </div>
-
-                <div className="mb-1">
-                  <p className="fw-bold mb-0">{likes[recipe.id]?.count || 0} likes</p>
-                </div>
-
-                <div className="mb-2">
-                  <p className="mb-1">
-                    <span className="fw-bold me-2">{recipe.title}</span>
-                    <span className="text-muted">{recipe.description?.substring(0, 100)}{recipe.description?.length > 100 ? '...' : ''}</span>
-                  </p>
-                  <Link to={`/recipes/${recipe.id}`} className="text-muted text-decoration-none">
-                    View full recipe
-                  </Link>
+                    
+                    {/* Add comment input */}
+                    <div className="input-group input-group-sm border-top pt-2">
+                      <input
+                        type="text"
+                        className="form-control border-0 bg-light"
+                        placeholder="Add a comment..."
+                        value={newComments[recipe.id] || ''}
+                        onChange={(e) => setNewComments(prev => ({ ...prev, [recipe.id]: e.target.value }))}
+                        style={{ 
+                          borderRadius: '20px',
+                          padding: '8px 12px',
+                          fontSize: '14px'
+                        }}
+                      />
+                      <button 
+                        className="btn btn-link text-primary"
+                        onClick={() => handleAddComment(recipe.id)}
+                        disabled={!newComments[recipe.id]?.trim()}
+                        style={{
+                          fontSize: '14px',
+                          fontWeight: '600',
+                          textDecoration: 'none'
+                        }}
+                      >
+                        Post
+                      </button>
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>
