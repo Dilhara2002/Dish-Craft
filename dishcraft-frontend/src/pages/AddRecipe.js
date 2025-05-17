@@ -9,7 +9,6 @@ const AddRecipe = () => {
     title: '',
     description: '',
     ingredients: '',
-    steps: '',
     imageUrl: ''
   });
 
@@ -23,26 +22,34 @@ const AddRecipe = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     const token = localStorage.getItem('token');
-try {
-  const payload = {
-    title: form.title,
-    description: form.description,
-    ingredients: form.ingredients.split(',').map(i => i.trim()),
-    instructions: form.steps.split('.').map(s => s.trim()).filter(s => s),
-    imageUrl: form.imageUrl,
-    tags: form.tags ? form.tags.split(',').map(t => t.trim()) : [] // only if tags are used in DTO
-  };
 
-  await axios.post('http://localhost:8080/api/recipes', payload, {
-    headers: {
-      Authorization: `Bearer ${token}`,
-      userid: localStorage.getItem('userId'), // Don't use string template unnecessarily
-      host: window.location.origin
-    }
-  });
+    try {
+      const payload = {
+        title: form.title,
+        description: form.description,
+        ingredients: form.ingredients
+          .split('\n')
+          .map(i => i.trim())
+          .filter(i => i),
+        instructions: form.instructions
+          ? form.instructions
+              .split('\n')
+              .map(step => step.trim())
+              .filter(step => step)
+          : [],
+        imageUrl: form.imageUrl
+      };
+
+      await axios.post('http://localhost:8080/api/recipes', payload, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          userid: localStorage.getItem('userId'),
+          host: window.location.origin
+        }
+      });
 
       alert('Recipe added successfully!');
-      navigate('/my-recipes');
+      navigate('/recipes');
     } catch (error) {
       console.error('Error adding recipe:', error);
       alert('Failed to add recipe');
@@ -53,29 +60,78 @@ try {
     <div className="container mt-4">
       <h2>Add New Recipe</h2>
       <form onSubmit={handleSubmit}>
-        {['title', 'description', 'ingredients', 'steps', 'imageUrl'].map((field, index) => (
-          <div className="mb-3" key={index}>
-            <label>{field.charAt(0).toUpperCase() + field.slice(1)}</label>
-            {field === 'description' ? (
-              <textarea
-                className="form-control"
-                name={field}
-                value={form[field]}
-                onChange={handleChange}
-                required={field !== 'imageUrl'}
-              />
-            ) : (
-              <input
-                type="text"
-                className="form-control"
-                name={field}
-                value={form[field]}
-                onChange={handleChange}
-                required={field !== 'imageUrl'}
-              />
-            )}
-          </div>
-        ))}
+        {/* Title */}
+        <div className="mb-3">
+          <label className="form-label">Title*</label>
+          <input
+            type="text"
+            className="form-control"
+            name="title"
+            value={form.title}
+            onChange={handleChange}
+            required
+          />
+        </div>
+
+        {/* Description */}
+        <div className="mb-3">
+          <label className="form-label">Description*</label>
+          <textarea
+            className="form-control"
+            name="description"
+            value={form.description}
+            onChange={handleChange}
+            required
+            rows={3}
+          />
+        </div>
+
+        {/* Ingredients */}
+        <div className="mb-3">
+          <label htmlFor="ingredients" className="form-label">
+            Ingredients* (one per line)
+          </label>
+          <textarea
+            className="form-control"
+            id="ingredients"
+            name="ingredients"
+            value={form.ingredients}
+            onChange={handleChange}
+            required
+            rows={5}
+            placeholder="Enter each ingredient on a new line"
+          />
+        </div>
+
+        {/* Instructions */}
+        <div className="mb-3">
+          <label htmlFor="instructions" className="form-label">
+            Instructions* (one step per line)
+          </label>
+          <textarea
+            className="form-control"
+            id="instructions"
+            name="instructions"
+            value={form.instructions || ''}
+            onChange={handleChange}
+            required
+            rows={5}
+            placeholder="Enter each instruction step on a new line"
+          />
+        </div>
+
+        {/* Image URL */}
+        <div className="mb-3">
+          <label className="form-label">Image URL</label>
+          <input
+            type="text"
+            className="form-control"
+            name="imageUrl"
+            value={form.imageUrl}
+            onChange={handleChange}
+          />
+        </div>
+
         <button type="submit" className="btn btn-primary">Add Recipe</button>
       </form>
     </div>
