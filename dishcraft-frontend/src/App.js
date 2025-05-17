@@ -23,6 +23,9 @@ import AddRecipe from './pages/AddRecipe.js';
 import MyRecipes from './pages/MyRecipes.js';
 import MyRecipesEdit from './pages/MyRecipesEdit.js';// For editing recipes
 
+//comunity group
+import CommunityGroup from './pages/CommunityGroups.js'; // Uncomment if you have a CommunityGroup page
+
 
 // Handles routing + navbar logic
 function AppContent() {
@@ -55,7 +58,11 @@ function AppContent() {
         <Route path="/MyRecipes" element={<MyRecipesEdit />} />
 
 
-        
+        {/* comunity group */}
+        <Route path="/community-group" element={<CommunityGroup />} /> {/* Uncomment if you have a CommunityGroup page */}
+
+        {/* Uncomment if you have a RecipeDetail page */}
+
         {/* Uncomment if you have a RecipeDetails page */}
 
        
