@@ -5,6 +5,8 @@ import com.dishcraft.model.Group;
 import com.dishcraft.service.GroupService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -48,4 +50,25 @@ public class GroupController {
 public void deleteGroup(@PathVariable String groupId) {
     groupService.deleteGroup(groupId);
 }
+
+      @PutMapping("/{id}")
+    public ResponseEntity<Group> updateGroup(
+            @PathVariable String id,
+            @Valid @RequestBody GroupRequestDTO groupDTO,
+            @RequestHeader("userId") String userId) {
+        
+        // Verify the user is the group creator
+        Group existingGroup = groupService.getGroupById(id);
+        if (existingGroup == null) {
+            return ResponseEntity.notFound().build();
+        }
+        
+        if (!existingGroup.getMembers().isEmpty() && 
+            !existingGroup.getMembers().get(0).equals(userId)) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+        }
+
+        Group updatedGroup = groupService.updateGroup(id, groupDTO);
+        return ResponseEntity.ok(updatedGroup);
+    }
 }

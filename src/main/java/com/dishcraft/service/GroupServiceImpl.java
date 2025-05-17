@@ -1,5 +1,6 @@
 package com.dishcraft.service;
 
+import com.dishcraft.dto.GroupRequestDTO;
 import com.dishcraft.model.Group;
 import com.dishcraft.repository.GroupRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -46,5 +47,15 @@ public class GroupServiceImpl implements GroupService {
 public void deleteGroup(String groupId) {
     groupRepository.deleteById(groupId);
 }
+@Override
+    public Group updateGroup(String id, GroupRequestDTO groupDTO) {
+        Group existingGroup = groupRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Group not found with id: " + id));
+        
+        existingGroup.setName(groupDTO.getName());
+        existingGroup.setDescription(groupDTO.getDescription());
+        
+        return groupRepository.save(existingGroup);
+    }
 
 }
