@@ -417,7 +417,7 @@ const CommunityGroups = () => {
                       <>
                         <button
                           style={{
-                            backgroundColor: '135deg, #3498db, #2980b9',
+                            backgroundColor: '',
                             color: '#975a16',
                             padding: '10px 20px',
                             borderRadius: '8px',
