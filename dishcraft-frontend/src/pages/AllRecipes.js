@@ -8,7 +8,7 @@ const MyRecipes = () => {
   const [recipes, setRecipes] = useState([]);
   const [comments, setComments] = useState({});
   const [likes, setLikes] = useState({});
-  const [newComments, setNewComments] = useState({}); // recipeId -> comment string
+  const [newComments, setNewComments] = useState({});
   const [editingComment, setEditingComment] = useState({ id: null, text: '' });
   const [loading, setLoading] = useState(true);
 
@@ -33,7 +33,6 @@ const MyRecipes = () => {
       setLikes(initialLikes);
       setComments(initialComments);
 
-      // Fetch all interactions once
       fetched.forEach(recipe => {
         fetchRecipeInteractions(recipe.id);
       });
@@ -49,7 +48,6 @@ const MyRecipes = () => {
   const fetchRecipeInteractions = (recipeId) => {
     if (!recipeId) return;
 
-    // Likes
     axios.get(`http://localhost:8080/api/interaction/likes/recipe/${recipeId}`, {
       headers: { Authorization: `Bearer ${token}` }
     })
@@ -66,7 +64,6 @@ const MyRecipes = () => {
     })
     .catch(err => console.error('Error fetching likes:', err));
 
-    // Comments
     axios.get(`http://localhost:8080/api/interaction/comments/recipe/${recipeId}`, {
       headers: { Authorization: `Bearer ${token}` }
     })
@@ -185,99 +182,385 @@ const MyRecipes = () => {
     .catch(err => console.error('Error deleting comment:', err));
   };
 
-  if (loading) return <div className="container mt-4">Loading recipes...</div>;
+  if (loading) return (
+    <div style={{
+      display: 'flex',
+      justifyContent: 'center',
+      alignItems: 'center',
+      height: '100vh',
+      fontSize: '1.5rem',
+      color: '#666'
+    }}>
+      Loading recipes...
+    </div>
+  );
 
   return (
-    <div className="container mt-4">
-      <h2>All Recipes</h2>
-      <Link to="/add" className="btn btn-success mb-3">Add New Recipe</Link>
+    <div style={{
+      maxWidth: '1200px',
+      margin: '0 auto',
+      padding: '20px',
+      backgroundColor: '#f8f9fa',
+      minHeight: '100vh'
+    }}>
+      <div style={{
+        display: 'flex',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        marginBottom: '30px',
+        paddingBottom: '15px',
+        borderBottom: '1px solid #dee2e6'
+      }}>
+        <h2 style={{
+          color: '#343a40',
+          fontWeight: '600',
+          margin: 0
+        }}>My Recipes</h2>
+        <Link 
+          to="/add" 
+          style={{
+            backgroundColor: '#28a745',
+            color: 'white',
+            padding: '8px 16px',
+            borderRadius: '4px',
+            textDecoration: 'none',
+            fontWeight: '500',
+            display: 'inline-flex',
+            alignItems: 'center',
+            gap: '8px',
+            transition: 'all 0.3s',
+            ':hover': {
+              backgroundColor: '#218838',
+              transform: 'translateY(-2px)'
+            }
+          }}
+        >
+          Add New Recipe
+        </Link>
+      </div>
 
-      <div className="row">
-        {recipes.length === 0 && <p>No recipes found.</p>}
+      {recipes.length === 0 && (
+        <div style={{
+          textAlign: 'center',
+          padding: '40px',
+          backgroundColor: 'white',
+          borderRadius: '8px',
+          boxShadow: '0 2px 8px rgba(0,0,0,0.1)'
+        }}>
+          <p style={{ fontSize: '1.2rem', color: '#6c757d' }}>No recipes found. Create your first recipe!</p>
+        </div>
+      )}
 
+      <div style={{
+        display: 'grid',
+        gridTemplateColumns: 'repeat(auto-fill, minmax(500px, 1fr))',
+        gap: '25px',
+        marginTop: '20px'
+      }}>
         {recipes.map((recipe) => (
-          <div key={recipe.id} className="col-md-4 mb-3">
-            <div className="card h-100">
+          <div key={recipe.id} style={{
+            backgroundColor: 'white',
+            borderRadius: '10px',
+            overflow: 'hidden',
+            boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
+            transition: 'transform 0.3s, box-shadow 0.3s',
+            ':hover': {
+              transform: 'translateY(-5px)',
+              boxShadow: '0 6px 16px rgba(0,0,0,0.15)'
+            }
+          }}>
+            <div style={{ display: 'flex', height: '100%' }}>
               {recipe.imageUrl && (
-                <img
-                  src={recipe.imageUrl}
-                  alt={recipe.title}
-                  className="card-img-top"
-                  style={{ height: '200px', objectFit: 'cover' }}
-                />
+                <div style={{
+                  width: '40%',
+                  minHeight: '300px',
+                  overflow: 'hidden'
+                }}>
+                  <img
+                    src={recipe.imageUrl}
+                    alt={recipe.title}
+                    style={{
+                      width: '100%',
+                      height: '100%',
+                      objectFit: 'cover',
+                      objectPosition: 'center'
+                    }}
+                  />
+                </div>
               )}
-              <div className="card-body">
-                <h5 className="card-title">{recipe.title}</h5>
-                <p className="card-text">{recipe.description?.substring(0, 100)}...</p>
+              
+              <div style={{
+                width: recipe.imageUrl ? '60%' : '100%',
+                padding: '20px',
+                display: 'flex',
+                flexDirection: 'column'
+              }}>
+                <h3 style={{
+                  margin: '0 0 10px 0',
+                  color: '#212529',
+                  fontSize: '1.5rem',
+                  fontWeight: '600'
+                }}>
+                  {recipe.title}
+                </h3>
+                
+                <p style={{
+                  color: '#495057',
+                  fontSize: '0.95rem',
+                  marginBottom: '15px',
+                  flexGrow: 1
+                }}>
+                  {recipe.description?.substring(0, 150)}...
+                </p>
 
-                <div className="d-flex align-items-center mb-2">
-                  <button onClick={() => handleLike(recipe.id)} className="btn btn-sm btn-outline-danger me-2">
-                    {likes[recipe.id]?.isLiked ? <FaHeart style={{ color: 'red' }} /> : <FaRegHeart />}
+                <div style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  marginBottom: '15px',
+                  gap: '10px'
+                }}>
+                  <button 
+                    onClick={() => handleLike(recipe.id)} 
+                    style={{
+                      border: 'none',
+                      background: 'transparent',
+                      cursor: 'pointer',
+                      padding: '5px',
+                      borderRadius: '50%',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      transition: 'all 0.2s',
+                      ':hover': {
+                        backgroundColor: 'rgba(220, 53, 69, 0.1)'
+                      }
+                    }}
+                  >
+                    {likes[recipe.id]?.isLiked ? (
+                      <FaHeart style={{ color: '#dc3545', fontSize: '1.2rem' }} />
+                    ) : (
+                      <FaRegHeart style={{ color: '#6c757d', fontSize: '1.2rem' }} />
+                    )}
                   </button>
-                  <span>{likes[recipe.id]?.count || 0} likes</span>
+                  <span style={{ color: '#6c757d', fontSize: '0.9rem' }}>
+                    {likes[recipe.id]?.count || 0} likes
+                  </span>
                 </div>
 
-                <div className="mb-3">
-                  <h6 className="d-flex align-items-center">
-                    <FaComment className="me-2" /> Comments ({comments[recipe.id]?.length || 0})
-                  </h6>
-                  <div style={{ maxHeight: '150px', overflowY: 'auto' }}>
-                    {comments[recipe.id]?.map(comment => (
-                      <div key={comment.id} className="mb-2 p-2 border-bottom">
-                        <div className="d-flex justify-content-between">
-                          <strong>{comment.username}</strong>
-                          <small className="text-muted">{comment.createdAt}</small>
-                        </div>
+                <div style={{ marginBottom: '15px' }}>
+                  <div style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    marginBottom: '10px',
+                    color: '#495057',
+                    gap: '8px'
+                  }}>
+                    <FaComment style={{ color: '#6c757d' }} />
+                    <span style={{ fontWeight: '500' }}>
+                      Comments ({comments[recipe.id]?.length || 0})
+                    </span>
+                  </div>
+                  
+                  <div style={{
+                    maxHeight: '150px',
+                    overflowY: 'auto',
+                    padding: '10px',
+                    backgroundColor: '#f8f9fa',
+                    borderRadius: '6px',
+                    marginBottom: '10px'
+                  }}>
+                    {comments[recipe.id]?.length > 0 ? (
+                      comments[recipe.id].map(comment => (
+                        <div key={comment.id} style={{
+                          marginBottom: '12px',
+                          paddingBottom: '12px',
+                          borderBottom: '1px solid #e9ecef'
+                        }}>
+                          <div style={{
+                            display: 'flex',
+                            justifyContent: 'space-between',
+                            marginBottom: '5px'
+                          }}>
+                            <strong style={{ color: '#212529' }}>{comment.username}</strong>
+                            <small style={{ color: '#6c757d' }}>{comment.createdAt}</small>
+                          </div>
 
-                        {editingComment.id === comment.id ? (
-                          <>
-                            <input
-                              type="text"
-                              className="form-control form-control-sm"
-                              value={editingComment.text}
-                              onChange={(e) => setEditingComment({ ...editingComment, text: e.target.value })}
-                            />
-                            <div className="d-flex justify-content-end mt-1">
-                              <button className="btn btn-sm btn-success me-1" onClick={() => handleUpdateComment(recipe.id, comment.id)}>
-                                <FaCheck />
-                              </button>
-                              <button className="btn btn-sm btn-secondary" onClick={cancelEditing}>
-                                <FaTimes />
-                              </button>
-                            </div>
-                          </>
-                        ) : (
-                          <>
-                            <p className="mb-1">{comment.text}</p>
-                            {comment.userId === userId && (
-                              <div className="d-flex justify-content-end">
-                                <button className="btn btn-sm btn-outline-primary me-1" onClick={() => startEditingComment(comment)}>
-                                  <FaEdit size={12} />
+                          {editingComment.id === comment.id ? (
+                            <>
+                              <input
+                                type="text"
+                                style={{
+                                  width: '100%',
+                                  padding: '6px 10px',
+                                  border: '1px solid #ced4da',
+                                  borderRadius: '4px',
+                                  marginBottom: '8px'
+                                }}
+                                value={editingComment.text}
+                                onChange={(e) => setEditingComment({ ...editingComment, text: e.target.value })}
+                              />
+                              <div style={{
+                                display: 'flex',
+                                justifyContent: 'flex-end',
+                                gap: '8px'
+                              }}>
+                                <button 
+                                  style={{
+                                    border: 'none',
+                                    backgroundColor: '#28a745',
+                                    color: 'white',
+                                    padding: '4px 8px',
+                                    borderRadius: '4px',
+                                    cursor: 'pointer',
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    gap: '4px'
+                                  }}
+                                  onClick={() => handleUpdateComment(recipe.id, comment.id)}
+                                >
+                                  <FaCheck size={12} /> Save
                                 </button>
-                                <button className="btn btn-sm btn-outline-danger" onClick={() => handleDeleteComment(recipe.id, comment.id)}>
-                                  <FaTrash size={12} />
+                                <button 
+                                  style={{
+                                    border: 'none',
+                                    backgroundColor: '#6c757d',
+                                    color: 'white',
+                                    padding: '4px 8px',
+                                    borderRadius: '4px',
+                                    cursor: 'pointer',
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    gap: '4px'
+                                  }}
+                                  onClick={cancelEditing}
+                                >
+                                  <FaTimes size={12} /> Cancel
                                 </button>
                               </div>
-                            )}
-                          </>
-                        )}
-                      </div>
-                    ))}
+                            </>
+                          ) : (
+                            <>
+                              <p style={{ 
+                                margin: '0 0 8px 0',
+                                color: '#495057',
+                                fontSize: '0.9rem'
+                              }}>
+                                {comment.text}
+                              </p>
+                              {comment.userId === userId && (
+                                <div style={{
+                                  display: 'flex',
+                                  justifyContent: 'flex-end',
+                                  gap: '8px'
+                                }}>
+                                  <button 
+                                    style={{
+                                      border: 'none',
+                                      backgroundColor: '#17a2b8',
+                                      color: 'white',
+                                      padding: '4px 8px',
+                                      borderRadius: '4px',
+                                      cursor: 'pointer',
+                                      display: 'flex',
+                                      alignItems: 'center',
+                                      gap: '4px'
+                                    }}
+                                    onClick={() => startEditingComment(comment)}
+                                  >
+                                    <FaEdit size={12} /> 
+                                  </button>
+                                  <button 
+                                    style={{
+                                      border: 'none',
+                                      backgroundColor: '#dc3545',
+                                      color: 'white',
+                                      padding: '4px 8px',
+                                      borderRadius: '4px',
+                                      cursor: 'pointer',
+                                      display: 'flex',
+                                      alignItems: 'center',
+                                      gap: '4px'
+                                    }}
+                                    onClick={() => handleDeleteComment(recipe.id, comment.id)}
+                                  >
+                                    <FaTrash size={12} /> 
+                                  </button>
+                                </div>
+                              )}
+                            </>
+                          )}
+                        </div>
+                      ))
+                    ) : (
+                      <p style={{ 
+                        color: '#6c757d',
+                        fontSize: '0.9rem',
+                        textAlign: 'center',
+                        margin: '10px 0'
+                      }}>
+                        No comments yet. Be the first to comment!
+                      </p>
+                    )}
+                  </div>
+
+                  <div style={{
+                    display: 'flex',
+                    gap: '10px',
+                    marginTop: '10px'
+                  }}>
+                    <input
+                      type="text"
+                      placeholder="Add a comment..."
+                      style={{
+                        flexGrow: 1,
+                        padding: '8px 12px',
+                        border: '1px solid #ced4da',
+                        borderRadius: '4px',
+                        fontSize: '0.9rem'
+                      }}
+                      value={newComments[recipe.id] || ''}
+                      onChange={(e) => setNewComments(prev => ({ ...prev, [recipe.id]: e.target.value }))}
+                    />
+                    <button 
+                      style={{
+                        border: 'none',
+                        backgroundColor: '#007bff',
+                        color: 'white',
+                        padding: '8px 16px',
+                        borderRadius: '4px',
+                        cursor: 'pointer',
+                        fontWeight: '500',
+                        transition: 'background-color 0.2s',
+                        ':hover': {
+                          backgroundColor: '#0069d9'
+                        }
+                      }}
+                      onClick={() => handleAddComment(recipe.id)}
+                    >
+                      Post
+                    </button>
                   </div>
                 </div>
 
-                <div className="input-group mb-3">
-                  <input
-                    type="text"
-                    className="form-control form-control-sm"
-                    placeholder="Add a comment..."
-                    value={newComments[recipe.id] || ''}
-                    onChange={(e) => setNewComments(prev => ({ ...prev, [recipe.id]: e.target.value }))}
-                  />
-                  <button className="btn btn-sm btn-primary" onClick={() => handleAddComment(recipe.id)}>Post</button>
+                <div style={{ marginTop: 'auto', display: 'flex', justifyContent: 'flex-end' }}>
+                  <Link 
+                    to={`/MyRecipes/${recipe.id}`}
+                    style={{
+                      backgroundColor: '#6c757d',
+                      color: 'white',
+                      padding: '8px 16px',
+                      borderRadius: '4px',
+                      textDecoration: 'none',
+                      fontSize: '0.9rem',
+                      transition: 'all 0.2s',
+                      ':hover': {
+                        backgroundColor: '#5a6268'
+                      }
+                    }}
+                  >
+                    View Details
+                  </Link>
                 </div>
-
-                <Link to={`/MyRecipes/${recipe.id}`} className="btn btn-sm btn-outline-primary">View Details</Link>
               </div>
             </div>
           </div>
