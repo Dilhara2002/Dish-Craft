@@ -489,41 +489,84 @@ const AllRecipes = () => {
     .catch(err => console.error('Error fetching comments:', err));
   };
 
-  const handleLike = (recipeId) => {
-    const current = likes[recipeId];
-    if (!current) return;
-
-    if (current.isLiked) {
-      axios.delete(`http://localhost:8080/api/interaction/likes/${current.likeId}`, {
-        headers: { Authorization: `Bearer ${token}`, userId }
-      })
-      .then(() => {
+  const handleLike = async (recipeId) => {
+    try {
+      const current = likes[recipeId];
+      if (!current) {
+        console.error('No like data found for recipe:', recipeId);
+        return;
+      }
+  
+      if (current.isLiked) {
+        // Debug log to check what we're sending
+        console.log('Attempting to unlike:', {
+          recipeId,
+          likeId: current.likeId,
+          userId
+        });
+  
+        if (!current.likeId) {
+          console.error('Cannot unlike - no likeId found');
+          return;
+        }
+  
+        const response = await axios.delete(
+          `http://localhost:8080/api/interaction/likes/${current.likeId}`,
+          {
+            headers: { 
+              Authorization: `Bearer ${token}`,
+              userId: userId 
+            },
+            params: {
+              recipeId: recipeId  // Some APIs might need this
+            }
+          }
+        );
+  
+        console.log('Unlike successful:', response.data);
+  
         setLikes(prev => ({
           ...prev,
           [recipeId]: {
             ...prev[recipeId],
-            count: prev[recipeId].count - 1,
+            count: Math.max(0, prev[recipeId].count - 1), // Ensure count doesn't go negative
             isLiked: false,
             likeId: null
           }
         }));
-      })
-      .catch(err => console.error('Error unliking recipe:', err));
-    } else {
-      axios.post(`http://localhost:8080/api/interaction/likes/${recipeId}`, {}, {
-        headers: { Authorization: `Bearer ${token}`, userId }
-      })
-      .then(res => {
+  
+      } else {
+        // Debug log for like action
+        console.log('Attempting to like recipe:', recipeId);
+  
+        const response = await axios.post(
+          `http://localhost:8080/api/interaction/likes/${recipeId}`,
+          {}, // Empty body
+          {
+            headers: { 
+              Authorization: `Bearer ${token}`,
+              userId: userId 
+            }
+          }
+        );
+  
+        console.log('Like successful:', response.data);
+  
         setLikes(prev => ({
           ...prev,
           [recipeId]: {
             count: prev[recipeId].count + 1,
             isLiked: true,
-            likeId: res.data.id
+            likeId: response.data.id // Ensure we're capturing the likeId correctly
           }
         }));
-      })
-      .catch(err => console.error('Error liking recipe:', err));
+      }
+    } catch (error) {
+      console.error('Error in handleLike:', {
+        error: error.response?.data || error.message,
+        recipeId,
+        currentLikeState: likes[recipeId]
+      });
     }
   };
 
