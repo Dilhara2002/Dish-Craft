@@ -14,6 +14,12 @@ const Navbar = ({ isLoggedIn = false }) => {
           <span className="fw-bold text-warning">Dish Craft</span>
         </a>
 
+
+      <div style={styles.navLinks}>
+        <Link to="/recipes" style={styles.navLink}>Recipes</Link>
+        <Link to="/myrecipes" style={styles.navLink}>My Recipes</Link>
+        <Link to="/community-group" style={styles.navLink}>Community Groups</Link>
+
         {/* Mobile Toggle Button */}
         <button 
           className="navbar-toggler border-0" 
@@ -22,6 +28,7 @@ const Navbar = ({ isLoggedIn = false }) => {
         >
           <span className="navbar-toggler-icon"></span>
         </button>
+
 
         {/* Navigation Links */}
         <div className={`collapse navbar-collapse ${isMenuOpen ? 'show' : ''}`}>

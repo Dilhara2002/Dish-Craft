@@ -125,6 +125,45 @@ const CommunityGroups = () => {
       minHeight: '100vh',
       fontFamily: "'Segoe UI', Tahoma, Geneva, Verdana, sans-serif"
     }}>
+
+      <div style={{
+        display: 'flex',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        marginBottom: '30px',
+        paddingBottom: '15px',
+        borderBottom: '1px solid #dee2e6'
+      }}>
+        {/* <h2 style={{
+          color: '#343a40',
+          fontWeight: '600',
+          margin: 0
+        }}>Community Groups</h2> */}
+        {/* <button
+          style={{
+            backgroundColor: '#28a745',
+            color: 'white',
+            padding: '8px 16px',
+            borderRadius: '4px',
+            border: 'none',
+            fontWeight: '500',
+            display: 'inline-flex',
+            alignItems: 'center',
+            gap: '8px',
+            cursor: 'pointer',
+            transition: 'all 0.3s',
+            ':hover': {
+              backgroundColor: '#218838',
+              transform: 'translateY(-2px)'
+            }
+          }}
+          onClick={() => navigate('/groups/create')}
+        >
+          <FaPlus /> 
+        </button> */}
+      </div>
+
+
       {/* Create Group Form */}
       <div style={{
         backgroundColor: '#ffffff',
