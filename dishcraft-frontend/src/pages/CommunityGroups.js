@@ -109,7 +109,8 @@ const CommunityGroups = () => {
       alignItems: 'center',
       height: '100vh',
       fontSize: '1.5rem',
-      color: '#666'
+      color: '#666',
+      backgroundColor: '#f5f7fa'
     }}>
       Loading groups...
     </div>
@@ -119,10 +120,12 @@ const CommunityGroups = () => {
     <div style={{
       maxWidth: '1200px',
       margin: '0 auto',
-      padding: '20px',
-      backgroundColor: '#f8f9fa',
-      minHeight: '100vh'
+      padding: '30px 20px',
+      backgroundColor: '#f5f7fa',
+      minHeight: '100vh',
+      fontFamily: "'Segoe UI', Tahoma, Geneva, Verdana, sans-serif"
     }}>
+
       <div style={{
         display: 'flex',
         justifyContent: 'space-between',
@@ -160,36 +163,59 @@ const CommunityGroups = () => {
         </button> */}
       </div>
 
+
       {/* Create Group Form */}
       <div style={{
-        backgroundColor: 'white',
-        borderRadius: '8px',
-        padding: '20px',
+        backgroundColor: '#ffffff',
+        borderRadius: '12px',
+        padding: '25px',
         marginBottom: '30px',
-        boxShadow: '0 2px 8px rgba(0,0,0,0.1)'
+        boxShadow: '0 4px 6px rgba(0, 0, 0, 0.05)',
+        border: '1px solid #e1e5eb'
       }}>
-        <h3 style={{ marginTop: 0, color: '#495057' }}>Create New Group</h3>
-        <div style={{ display: 'flex', gap: '15px', marginBottom: '15px' }}>
+        <h3 style={{ 
+          margin: '0 0 20px 0', 
+          color: '#2d3748',
+          fontSize: '1.5rem',
+          fontWeight: '600'
+        }}>Create New Group</h3>
+        <div style={{ 
+          display: 'flex', 
+          gap: '15px', 
+          marginBottom: '20px',
+          flexDirection: 'column'
+        }}>
           <input
             type="text"
             placeholder="Group name"
             style={{
-              flex: 1,
-              padding: '8px 12px',
-              border: '1px solid #ced4da',
-              borderRadius: '4px'
+              padding: '12px 15px',
+              border: '1px solid #e2e8f0',
+              borderRadius: '8px',
+              fontSize: '1rem',
+              outline: 'none',
+              transition: 'border-color 0.2s',
+              ':focus': {
+                borderColor: '#4299e1'
+              }
             }}
             value={newGroup.name}
             onChange={(e) => setNewGroup({ ...newGroup, name: e.target.value })}
           />
-          <input
-            type="text"
+          <textarea
             placeholder="Description (optional)"
             style={{
-              flex: 1,
-              padding: '8px 12px',
-              border: '1px solid #ced4da',
-              borderRadius: '4px'
+              padding: '12px 15px',
+              border: '1px solid #e2e8f0',
+              borderRadius: '8px',
+              fontSize: '1rem',
+              minHeight: '100px',
+              resize: 'vertical',
+              outline: 'none',
+              transition: 'border-color 0.2s',
+              ':focus': {
+                borderColor: '#4299e1'
+              }
             }}
             value={newGroup.description}
             onChange={(e) => setNewGroup({ ...newGroup, description: e.target.value })}
@@ -197,14 +223,21 @@ const CommunityGroups = () => {
         </div>
         <button
           style={{
-            backgroundColor: '#007bff',
+            backgroundColor: '#4299e1',
             color: 'white',
-            padding: '8px 16px',
-            borderRadius: '4px',
+            padding: '12px 24px',
+            borderRadius: '8px',
             border: 'none',
             cursor: 'pointer',
+            fontSize: '1rem',
+            fontWeight: '500',
+            transition: 'background-color 0.2s, transform 0.2s',
             ':hover': {
-              backgroundColor: '#0069d9'
+              backgroundColor: '#3182ce',
+              transform: 'translateY(-1px)'
+            },
+            ':active': {
+              transform: 'translateY(0)'
             }
           }}
           onClick={handleCreateGroup}
@@ -216,12 +249,18 @@ const CommunityGroups = () => {
       {groups.length === 0 && (
         <div style={{
           textAlign: 'center',
-          padding: '40px',
+          padding: '50px 20px',
           backgroundColor: 'white',
-          borderRadius: '8px',
-          boxShadow: '0 2px 8px rgba(0,0,0,0.1)'
+          borderRadius: '12px',
+          boxShadow: '0 4px 6px rgba(0, 0, 0, 0.05)',
+          border: '1px solid #e1e5eb',
+          marginBottom: '30px'
         }}>
-          <p style={{ fontSize: '1.2rem', color: '#6c757d' }}>No groups found. Create your first group!</p>
+          <p style={{ 
+            fontSize: '1.2rem', 
+            color: '#718096',
+            margin: '0'
+          }}>No groups found. Create your first group!</p>
         </div>
       )}
 
@@ -234,27 +273,34 @@ const CommunityGroups = () => {
         {groups.map((group) => (
           <div key={group.id} style={{
             backgroundColor: 'white',
-            borderRadius: '10px',
+            borderRadius: '12px',
             overflow: 'hidden',
-            boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
+            boxShadow: '0 4px 6px rgba(0, 0, 0, 0.05)',
             transition: 'transform 0.3s, box-shadow 0.3s',
+            border: '1px solid #e1e5eb',
             ':hover': {
               transform: 'translateY(-5px)',
-              boxShadow: '0 6px 16px rgba(0,0,0,0.15)'
+              boxShadow: '0 10px 15px rgba(0, 0, 0, 0.1)'
             }
           }}>
-            <div style={{ padding: '20px' }}>
+            <div style={{ padding: '25px' }}>
               {editingGroup.id === group.id ? (
                 <>
-                  <div style={{ marginBottom: '15px' }}>
+                  <div style={{ marginBottom: '20px' }}>
                     <input
                       type="text"
                       style={{
                         width: '100%',
-                        padding: '8px 12px',
-                        border: '1px solid #ced4da',
-                        borderRadius: '4px',
-                        marginBottom: '10px'
+                        padding: '12px 15px',
+                        border: '1px solid #e2e8f0',
+                        borderRadius: '8px',
+                        marginBottom: '15px',
+                        fontSize: '1rem',
+                        outline: 'none',
+                        transition: 'border-color 0.2s',
+                        ':focus': {
+                          borderColor: '#4299e1'
+                        }
                       }}
                       value={editingGroup.name}
                       onChange={(e) => setEditingGroup({ ...editingGroup, name: e.target.value })}
@@ -262,10 +308,17 @@ const CommunityGroups = () => {
                     <textarea
                       style={{
                         width: '100%',
-                        padding: '8px 12px',
-                        border: '1px solid #ced4da',
-                        borderRadius: '4px',
-                        minHeight: '80px'
+                        padding: '12px 15px',
+                        border: '1px solid #e2e8f0',
+                        borderRadius: '8px',
+                        minHeight: '100px',
+                        fontSize: '1rem',
+                        resize: 'vertical',
+                        outline: 'none',
+                        transition: 'border-color 0.2s',
+                        ':focus': {
+                          borderColor: '#4299e1'
+                        }
                       }}
                       value={editingGroup.description}
                       onChange={(e) => setEditingGroup({ ...editingGroup, description: e.target.value })}
@@ -274,57 +327,65 @@ const CommunityGroups = () => {
                   <div style={{
                     display: 'flex',
                     justifyContent: 'flex-end',
-                    gap: '8px'
+                    gap: '12px'
                   }}>
                     <button 
                       style={{
                         border: 'none',
-                        backgroundColor: '#28a745',
+                        backgroundColor: '#48bb78',
                         color: 'white',
-                        padding: '6px 12px',
-                        borderRadius: '4px',
+                        padding: '10px 20px',
+                        borderRadius: '8px',
                         cursor: 'pointer',
                         display: 'flex',
                         alignItems: 'center',
-                        gap: '4px'
+                        gap: '8px',
+                        fontSize: '0.9rem',
+                        fontWeight: '500',
+                        transition: 'background-color 0.2s'
                       }}
                       onClick={handleUpdateGroup}
                     >
-                      <FaCheck size={12} /> Save
+                      <FaCheck size={14} /> Save
                     </button>
                     <button 
                       style={{
                         border: 'none',
-                        backgroundColor: '#6c757d',
+                        backgroundColor: '#a0aec0',
                         color: 'white',
-                        padding: '6px 12px',
-                        borderRadius: '4px',
+                        padding: '10px 20px',
+                        borderRadius: '8px',
                         cursor: 'pointer',
                         display: 'flex',
                         alignItems: 'center',
-                        gap: '4px'
+                        gap: '8px',
+                        fontSize: '0.9rem',
+                        fontWeight: '500',
+                        transition: 'background-color 0.2s'
                       }}
                       onClick={cancelEditing}
                     >
-                      <FaTimes size={12} /> Cancel
+                      <FaTimes size={14} /> Cancel
                     </button>
                   </div>
                 </>
               ) : (
                 <>
                   <h3 style={{
-                    margin: '0 0 10px 0',
-                    color: '#212529',
-                    fontSize: '1.3rem',
-                    fontWeight: '600'
+                    margin: '0 0 15px 0',
+                    color: '#2d3748',
+                    fontSize: '1.4rem',
+                    fontWeight: '600',
+                    lineHeight: '1.3'
                   }}>
                     {group.name}
                   </h3>
                   
                   <p style={{
-                    color: '#495057',
-                    fontSize: '0.95rem',
-                    marginBottom: '15px'
+                    color: '#4a5568',
+                    fontSize: '1rem',
+                    marginBottom: '20px',
+                    lineHeight: '1.5'
                   }}>
                     {group.description || 'No description provided'}
                   </p>
@@ -332,32 +393,39 @@ const CommunityGroups = () => {
                   <div style={{
                     display: 'flex',
                     alignItems: 'center',
-                    marginBottom: '15px',
-                    gap: '10px'
+                    marginBottom: '20px',
+                    gap: '10px',
+                    color: '#718096'
                   }}>
-                    <FaUsers style={{ color: '#6c757d' }} />
-                    <span style={{ color: '#6c757d', fontSize: '0.9rem' }}>
+                    <FaUsers size={18} />
+                    <span style={{ fontSize: '0.95rem' }}>
                       {group.members?.length || 0} members
                     </span>
                   </div>
 
                   <div style={{
                     display: 'flex',
-                    gap: '10px',
-                    marginTop: '15px'
+                    gap: '12px',
+                    marginTop: '25px',
+                    flexWrap: 'wrap'
                   }}>
                     {!isGroupMember(group) ? (
                       <button
                         style={{
-                          backgroundColor: '#17a2b8',
+                          backgroundColor: '#38b2ac',
                           color: 'white',
-                          padding: '8px 16px',
-                          borderRadius: '4px',
+                          padding: '10px 20px',
+                          borderRadius: '8px',
                           border: 'none',
                           cursor: 'pointer',
-                          flex: 1,
+                          flex: '1 1 auto',
+                          minWidth: '120px',
+                          fontSize: '0.95rem',
+                          fontWeight: '500',
+                          transition: 'background-color 0.2s, transform 0.2s',
                           ':hover': {
-                            backgroundColor: '#138496'
+                            backgroundColor: '#319795',
+                            transform: 'translateY(-1px)'
                           }
                         }}
                         onClick={() => handleJoinGroup(group.id)}
@@ -367,13 +435,16 @@ const CommunityGroups = () => {
                     ) : (
                       <button
                         style={{
-                          backgroundColor: '#6c757d',
-                          color: 'white',
-                          padding: '8px 16px',
-                          borderRadius: '4px',
+                          backgroundColor: '#cbd5e0',
+                          color: '#4a5568',
+                          padding: '10px 20px',
+                          borderRadius: '8px',
                           border: 'none',
                           cursor: 'not-allowed',
-                          flex: 1
+                          flex: '1 1 auto',
+                          minWidth: '120px',
+                          fontSize: '0.95rem',
+                          fontWeight: '500'
                         }}
                         disabled
                       >
@@ -385,41 +456,53 @@ const CommunityGroups = () => {
                       <>
                         <button
                           style={{
-                            backgroundColor: '#ffc107',
-                            color: '#212529',
-                            padding: '8px 16px',
-                            borderRadius: '4px',
+                            backgroundColor: '',
+                            color: '#975a16',
+                            padding: '10px 20px',
+                            borderRadius: '8px',
                             border: 'none',
                             cursor: 'pointer',
                             display: 'flex',
                             alignItems: 'center',
-                            gap: '5px',
+                            justifyContent: 'center',
+                            gap: '8px',
+                            flex: '0 1 auto',
+                            fontSize: '0.95rem',
+                            fontWeight: '500',
+                            transition: 'background-color 0.2s, transform 0.2s',
                             ':hover': {
-                              backgroundColor: '#e0a800'
+                              backgroundColor: '#ecc94b',
+                              transform: 'translateY(-1px)'
                             }
                           }}
                           onClick={() => startEditingGroup(group)}
                         >
-                          <FaEdit size={14} /> Edit
+                          <FaEdit size={14} /> 
                         </button>
                         <button
                           style={{
-                            backgroundColor: '#dc3545',
+                            backgroundColor: '#f56565',
                             color: 'white',
-                            padding: '8px 16px',
-                            borderRadius: '4px',
+                            padding: '10px 20px',
+                            borderRadius: '8px',
                             border: 'none',
                             cursor: 'pointer',
                             display: 'flex',
                             alignItems: 'center',
-                            gap: '5px',
+                            justifyContent: 'center',
+                            gap: '8px',
+                            flex: '0 1 auto',
+                            fontSize: '0.95rem',
+                            fontWeight: '500',
+                            transition: 'background-color 0.2s, transform 0.2s',
                             ':hover': {
-                              backgroundColor: '#c82333'
+                              backgroundColor: '#e53e3e',
+                              transform: 'translateY(-1px)'
                             }
                           }}
                           onClick={() => confirmDeleteGroup(group)}
                         >
-                          <FaTrash size={14} /> Delete
+                          <FaTrash size={14} /> 
                         </button>
                       </>
                     )}
@@ -443,31 +526,43 @@ const CommunityGroups = () => {
           display: 'flex',
           justifyContent: 'center',
           alignItems: 'center',
-          zIndex: 1000
+          zIndex: 1000,
+          backdropFilter: 'blur(3px)'
         }}>
           <div style={{
             backgroundColor: 'white',
-            padding: '20px',
-            borderRadius: '8px',
-            width: '400px',
-            maxWidth: '90%'
+            padding: '25px',
+            borderRadius: '12px',
+            width: '450px',
+            maxWidth: '90%',
+            boxShadow: '0 10px 25px rgba(0, 0, 0, 0.2)'
           }}>
-            <h3 style={{ marginTop: 0 }}>Confirm Delete</h3>
-            <p>Are you sure you want to delete the group "{groupToDelete?.name}"?</p>
+            <h3 style={{ 
+              margin: '0 0 20px 0',
+              color: '#2d3748',
+              fontSize: '1.3rem'
+            }}>Confirm Delete</h3>
+            <p style={{
+              color: '#4a5568',
+              margin: '0 0 25px 0',
+              lineHeight: '1.5'
+            }}>Are you sure you want to delete the group "{groupToDelete?.name}"? This action cannot be undone.</p>
             <div style={{
               display: 'flex',
               justifyContent: 'flex-end',
-              gap: '10px',
-              marginTop: '20px'
+              gap: '15px'
             }}>
               <button
                 style={{
-                  backgroundColor: '#6c757d',
-                  color: 'white',
-                  padding: '8px 16px',
-                  borderRadius: '4px',
+                  backgroundColor: '#e2e8f0',
+                  color: '#4a5568',
+                  padding: '10px 20px',
+                  borderRadius: '8px',
                   border: 'none',
-                  cursor: 'pointer'
+                  cursor: 'pointer',
+                  fontSize: '0.95rem',
+                  fontWeight: '500',
+                  transition: 'background-color 0.2s'
                 }}
                 onClick={() => setShowDeleteModal(false)}
               >
@@ -475,16 +570,22 @@ const CommunityGroups = () => {
               </button>
               <button
                 style={{
-                  backgroundColor: '#dc3545',
+                  backgroundColor: '#f56565',
                   color: 'white',
-                  padding: '8px 16px',
-                  borderRadius: '4px',
+                  padding: '10px 20px',
+                  borderRadius: '8px',
                   border: 'none',
-                  cursor: 'pointer'
+                  cursor: 'pointer',
+                  fontSize: '0.95rem',
+                  fontWeight: '500',
+                  transition: 'background-color 0.2s',
+                  ':hover': {
+                    backgroundColor: '#e53e3e'
+                  }
                 }}
                 onClick={handleDeleteGroup}
               >
-                Delete
+                Delete Group
               </button>
             </div>
           </div>

@@ -53,7 +53,7 @@ const MyRecipes = () => {
           fontSize: '28px',
           fontWeight: '600',
           margin: '0'
-        }}>My Recipes</h2>
+        }}></h2>
         <Link 
           to="/add" 
           style={{
