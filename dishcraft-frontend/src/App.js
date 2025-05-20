@@ -11,7 +11,6 @@ import Profile from './pages/Profile'; // Uncomment if you have a Profile page
 import Navbar from './components/Navbar';          // For Login & Register pages
 import UserNavbar from './components/UserNavbar';  // For Home page
 import AdminNavbar from './components/AdminNavbar';
-
 // For Admin page
 import AdminDashboard from './pages/AdminDashboard.js';
 
@@ -57,7 +56,7 @@ function AppContent() {
         <Route path="/add" element={<AddRecipe />} />
         <Route path="/MyRecipes" element={<MyRecipesEdit />} />
 
-
+      
         {/* comunity group */}
         <Route path="/community-group" element={<CommunityGroup />} /> {/* Uncomment if you have a CommunityGroup page */}
 
