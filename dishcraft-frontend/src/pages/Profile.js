@@ -8,6 +8,7 @@ const Profile = () => {
   const [edit, setEdit] = useState(false);
   const [loading, setLoading] = useState(true);
   const [imagePreview, setImagePreview] = useState(null);
+  const [showSuccessModal, setShowSuccessModal] = useState(false);
 
   const token = localStorage.getItem('token');
   const userId = localStorage.getItem('userId');
@@ -60,13 +61,16 @@ const Profile = () => {
       });
       setProfile(res.data);
       setEdit(false);
-      alert('Profile updated successfully!');
+      setShowSuccessModal(true); // Show success modal instead of alert
     } catch (err) {
       console.error('Update failed:', err);
       alert('Failed to update profile. Please try again.');
     } finally {
       setLoading(false);
     }
+  };
+  const handleCloseSuccessModal = () => {
+    setShowSuccessModal(false);
   };
 
   const handleLogout = () => {
@@ -185,6 +189,33 @@ const Profile = () => {
                   )}
                 </div>
               </div>
+              {/* Success Modal */}
+{showSuccessModal && (
+  <div className="modal fade show" style={{ display: 'block', backgroundColor: 'rgba(0,0,0,0.5)', position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, zIndex: 1050 }}>
+    <div className="modal-dialog modal-dialog-centered">
+      <div className="modal-content">
+        <div className="modal-header bg-success text-white">
+          <h5 className="modal-title">Success!</h5>
+          <button type="button" className="btn-close btn-close-white" onClick={handleCloseSuccessModal}></button>
+        </div>
+        <div className="modal-body text-center py-4">
+          <div className="mb-3">
+            <svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" fill="#28a745" className="bi bi-check-circle-fill" viewBox="0 0 16 16">
+              <path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zm-3.97-3.03a.75.75 0 0 0-1.08.022L7.477 9.417 5.384 7.323a.75.75 0 0 0-1.06 1.06L6.97 11.03a.75.75 0 0 0 1.079-.02l3.992-4.99a.75.75 0 0 0-.01-1.05z"/>
+            </svg>
+          </div>
+          <h4 className="mb-3">Profile Updated Successfully!</h4>
+          <p>Your profile changes have been saved.</p>
+        </div>
+        <div className="modal-footer justify-content-center">
+          <button type="button" className="btn btn-success" onClick={handleCloseSuccessModal}>
+            Continue
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+)}
 
               <h3 className="mb-0" style={{
                 fontSize: '2rem',

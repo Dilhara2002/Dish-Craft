@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { Link } from 'react-router-dom';
 
 const Navbar = ({ isLoggedIn = false }) => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -7,57 +8,52 @@ const Navbar = ({ isLoggedIn = false }) => {
     <nav className="navbar navbar-expand-lg navbar-light bg-white sticky-top shadow-sm">
       <div className="container">
         {/* Brand */}
-        <a href="/recipes" className="navbar-brand d-flex align-items-center">
+        <Link to="/recipes" className="navbar-brand d-flex align-items-center">
           <div className="bg-warning rounded-circle p-2 me-2 d-flex align-items-center justify-content-center">
             <span className="fw-bold text-white">DC</span>
           </div>
           <span className="fw-bold text-warning">Dish Craft</span>
-        </a>
-
-
-      <div style={styles.navLinks}>
-        <Link to="/recipes" style={styles.navLink}>Recipes</Link>
-        <Link to="/myrecipes" style={styles.navLink}>My Recipes</Link>
-        <Link to="/community-group" style={styles.navLink}>Community Groups</Link>
+        </Link>
 
         {/* Mobile Toggle Button */}
         <button 
           className="navbar-toggler border-0" 
           type="button" 
           onClick={() => setIsMenuOpen(!isMenuOpen)}
+          aria-expanded={isMenuOpen}
+          aria-label="Toggle navigation"
         >
           <span className="navbar-toggler-icon"></span>
         </button>
-
 
         {/* Navigation Links */}
         <div className={`collapse navbar-collapse ${isMenuOpen ? 'show' : ''}`}>
           <ul className="navbar-nav ms-auto mb-2 mb-lg-0 align-items-center">
             <li className="nav-item">
-              <a href="/recipes" className="nav-link px-3 fw-medium">
+              <Link to="/recipes" className="nav-link px-3 fw-medium">
                 Recipes
-              </a>
+              </Link>
             </li>
             <li className="nav-item">
-              <a href="/myrecipes" className="nav-link px-3 fw-medium">
+              <Link to="/myrecipes" className="nav-link px-3 fw-medium">
                 My Recipes
-              </a>
+              </Link>
             </li>
             <li className="nav-item">
-              <a href="/community-group" className="nav-link px-3 fw-medium">
+              <Link to="/community-group" className="nav-link px-3 fw-medium">
                 Community Groups
-              </a>
+              </Link>
             </li>
 
             {isLoggedIn ? (
               <>
                 <li className="nav-item">
-                  <a href="/create-post" className="nav-link px-3 fw-medium">
+                  <Link to="/create-post" className="nav-link px-3 fw-medium">
                     Create Post
-                  </a>
+                  </Link>
                 </li>
                 <li className="nav-item">
-                  <a href="/notifications" className="nav-link px-3 position-relative">
+                  <Link to="/notifications" className="nav-link px-3 position-relative">
                     <svg xmlns="http://www.w3.org/2000/svg" 
                         width="20" height="20" 
                         fill="currentColor" 
@@ -69,12 +65,12 @@ const Navbar = ({ isLoggedIn = false }) => {
                       3
                       <span className="visually-hidden">unread notifications</span>
                     </span>
-                  </a>
+                  </Link>
                 </li>
                 <li className="nav-item ms-2">
                   <div className="dropdown">
-                    <a 
-                      href="/profile" 
+                    <Link 
+                      to="/profile" 
                       className="nav-link p-0"
                       role="button"
                       id="profileDropdown"
@@ -88,12 +84,12 @@ const Navbar = ({ isLoggedIn = false }) => {
                           className="img-fluid"
                         />
                       </div>
-                    </a>
+                    </Link>
                     <ul className="dropdown-menu dropdown-menu-end shadow-sm mt-2" aria-labelledby="profileDropdown">
-                      <li><a href="/profile" className="dropdown-item">Profile</a></li>
-                      <li><a href="/settings" className="dropdown-item">Settings</a></li>
+                      <li><Link to="/profile" className="dropdown-item">Profile</Link></li>
+                      <li><Link to="/settings" className="dropdown-item">Settings</Link></li>
                       <li><hr className="dropdown-divider" /></li>
-                      <li><a href="/logout" className="dropdown-item text-danger">Logout</a></li>
+                      <li><Link to="/logout" className="dropdown-item text-danger">Logout</Link></li>
                     </ul>
                   </div>
                 </li>
@@ -101,7 +97,7 @@ const Navbar = ({ isLoggedIn = false }) => {
             ) : (
               <>
                 <li className="nav-item">
-                  <a href="/profile" className="nav-link px-3 fw-medium">Profile</a>
+                  <Link to="/login" className="nav-link px-3 fw-medium">Profile</Link>
                 </li>
                 <li className="nav-item">
                   
