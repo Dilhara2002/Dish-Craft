@@ -13,6 +13,9 @@ const Login = () => {
   const [toastMessage, setToastMessage] = useState('');
   const [toastType, setToastType] = useState('success');
   const navigate = useNavigate();
+  const [showModal, setShowModal] = useState(false);
+  const [modalMessage, setModalMessage] = useState('');
+  const [modalType, setModalType] = useState('success'); // 'success' or 'error'
 
   useEffect(() => {
     const token = localStorage.getItem('token');
@@ -35,7 +38,7 @@ const Login = () => {
     e.preventDefault();
     setLoading(true);
     setError('');
-    
+
     try {
       const response = await axios.post('http://localhost:8080/api/auth/authenticate', {
         email,
@@ -47,24 +50,27 @@ const Login = () => {
       localStorage.setItem('token', token);
       localStorage.setItem('userId', id);
 
-      setToastType('success');
-      setToastMessage('Login successful! Redirecting to your profile...');
-      setShowToast(true);
-      
+      setModalType('success');
+      setModalMessage('Login successful! Redirecting to your recipes...');
+      setShowModal(true);
+
       setTimeout(() => {
         navigate('/recipes');
-      }, 1500);
+      }, 2000);
 
     } catch (err) {
       const errorMsg = err.response?.data?.message || 'Login failed. Please check your credentials.';
       setError(errorMsg);
-      
-      setToastType('danger');
-      setToastMessage(errorMsg);
-      setShowToast(true);
+
+      setModalType('danger');
+      setModalMessage(errorMsg);
+      setShowModal(true);
     } finally {
       setLoading(false);
     }
+  };
+  const handleCloseModal = () => {
+    setShowModal(false);
   };
 
   const togglePasswordVisibility = () => {
@@ -72,27 +78,27 @@ const Login = () => {
   };
 
   return (
-    <div 
-      className="container-fluid bg-light" 
-      style={{ 
+    <div
+      className="container-fluid bg-light"
+      style={{
         minHeight: '100vh',
         background: 'linear-gradient(135deg, #f5f7fa 0%, #e4e8f0 100%)'
       }}
     >
-      <div 
-        className="row justify-content-center align-items-center" 
-        style={{ 
+      <div
+        className="row justify-content-center align-items-center"
+        style={{
           minHeight: '100vh',
           padding: '20px 0'
         }}
       >
-        <div 
+        <div
           className="col-md-5 col-lg-4"
           style={{
             animation: 'fadeIn 0.5s ease-in-out'
           }}
         >
-          <div 
+          <div
             className="card shadow-lg border-0 rounded-lg"
             style={{
               border: 'none',
@@ -103,7 +109,7 @@ const Login = () => {
               }
             }}
           >
-            <div 
+            <div
               className="card-header text-center py-4"
               style={{
                 background: 'linear-gradient(45deg, #3f51b5, #2196f3)',
@@ -112,7 +118,7 @@ const Login = () => {
                 boxShadow: '0 2px 10px rgba(0,0,0,0.1)'
               }}
             >
-              <h3 
+              <h3
                 className="mb-0 fw-bold"
                 style={{
                   display: 'flex',
@@ -125,7 +131,7 @@ const Login = () => {
                 <LogIn className="me-2" size={24} />
                 Sign In
               </h3>
-              <p 
+              <p
                 className="mb-0"
                 style={{
                   opacity: 0.8,
@@ -136,22 +142,22 @@ const Login = () => {
                 Access your account
               </p>
             </div>
-            
-            <div 
+
+            <div
               className="card-body p-4 p-md-5"
               style={{
                 backgroundColor: 'white'
               }}
             >
               <form onSubmit={handleSubmit}>
-                <div 
+                <div
                   className="mb-4"
                   style={{
                     marginBottom: '1.5rem'
                   }}
                 >
-                  <label 
-                    htmlFor="email-address" 
+                  <label
+                    htmlFor="email-address"
                     className="form-label"
                     style={{
                       display: 'block',
@@ -162,7 +168,7 @@ const Login = () => {
                   >
                     Email Address
                   </label>
-                  <div 
+                  <div
                     className="input-group"
                     style={{
                       position: 'relative',
@@ -171,7 +177,7 @@ const Login = () => {
                       width: '100%'
                     }}
                   >
-                    <span 
+                    <span
                       className="input-group-text"
                       style={{
                         backgroundColor: '#f8f9fa',
@@ -218,15 +224,15 @@ const Login = () => {
                     />
                   </div>
                 </div>
-                
-                <div 
+
+                <div
                   className="mb-4"
                   style={{
                     marginBottom: '1.5rem'
                   }}
                 >
-                  <label 
-                    htmlFor="password" 
+                  <label
+                    htmlFor="password"
                     className="form-label"
                     style={{
                       display: 'block',
@@ -237,7 +243,7 @@ const Login = () => {
                   >
                     Password
                   </label>
-                  <div 
+                  <div
                     className="input-group"
                     style={{
                       position: 'relative',
@@ -246,7 +252,7 @@ const Login = () => {
                       width: '100%'
                     }}
                   >
-                    <span 
+                    <span
                       className="input-group-text"
                       style={{
                         backgroundColor: '#f8f9fa',
@@ -290,8 +296,8 @@ const Login = () => {
                         }
                       }}
                     />
-                    <button 
-                      type="button" 
+                    <button
+                      type="button"
                       className="input-group-text bg-white"
                       onClick={togglePasswordVisibility}
                       style={{
@@ -308,15 +314,71 @@ const Login = () => {
                         }
                       }}
                     >
-                      {showPassword ? 
-                        <EyeOff size={18} style={{ color: '#6c757d' }} /> : 
+                      {showPassword ?
+                        <EyeOff size={18} style={{ color: '#6c757d' }} /> :
                         <Eye size={18} style={{ color: '#6c757d' }} />
                       }
                     </button>
                   </div>
                 </div>
+                {/* Success/Error Modal */}
+                {showModal && (
+                  <div className="modal fade show" style={{
+                    display: 'block',
+                    backgroundColor: 'rgba(0,0,0,0.5)',
+                    position: 'fixed',
+                    top: 0,
+                    left: 0,
+                    right: 0,
+                    bottom: 0,
+                    zIndex: 1050
+                  }}>
+                    <div className="modal-dialog modal-dialog-centered">
+                      <div className="modal-content">
+                        <div className={`modal-header ${modalType === 'success' ? 'bg-success' : 'bg-danger'} text-white`}>
+                          <h5 className="modal-title">
+                            {modalType === 'success' ? 'Success!' : 'Error!'}
+                          </h5>
+                          <button
+                            type="button"
+                            className="btn-close btn-close-white"
+                            onClick={handleCloseModal}
+                          ></button>
+                        </div>
+                        <div className="modal-body text-center py-4">
+                          <div className="mb-3">
+                            {modalType === 'success' ? (
+                              <svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" fill="#28a745" className="bi bi-check-circle-fill" viewBox="0 0 16 16">
+                                <path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zm-3.97-3.03a.75.75 0 0 0-1.08.022L7.477 9.417 5.384 7.323a.75.75 0 0 0-1.06 1.06L6.97 11.03a.75.75 0 0 0 1.079-.02l3.992-4.99a.75.75 0 0 0-.01-1.05z" />
+                              </svg>
+                            ) : (
+                              <svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" fill="#dc3545" className="bi bi-exclamation-triangle-fill" viewBox="0 0 16 16">
+                                <path d="M8.982 1.566a1.13 1.13 0 0 0-1.96 0L.165 13.233c-.457.778.091 1.767.98 1.767h13.713c.889 0 1.438-.99.98-1.767L8.982 1.566zM8 5c.535 0 .954.462.9.995l-.35 3.507a.552.552 0 0 1-1.1 0L7.1 5.995A.905.905 0 0 1 8 5zm.002 6a1 1 0 1 1 0 2 1 1 0 0 1 0-2z" />
+                              </svg>
+                            )}
+                          </div>
+                          <h4 className="mb-3">{modalMessage}</h4>
+                          {modalType === 'success' && (
+                            <div className="spinner-border text-primary mt-2" role="status">
+                              <span className="visually-hidden">Loading...</span>
+                            </div>
+                          )}
+                        </div>
+                        <div className="modal-footer justify-content-center">
+                          <button
+                            type="button"
+                            className={`btn ${modalType === 'success' ? 'btn-success' : 'btn-danger'}`}
+                            onClick={handleCloseModal}
+                          >
+                            {modalType === 'success' ? 'Continue' : 'Try Again'}
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                )}
 
-                <div 
+                <div
                   className="d-flex justify-content-between align-items-center mb-4"
                   style={{
                     display: 'flex',
@@ -325,7 +387,7 @@ const Login = () => {
                     marginBottom: '1.5rem'
                   }}
                 >
-                  <div 
+                  <div
                     className="form-check"
                     style={{
                       display: 'flex',
@@ -355,8 +417,8 @@ const Login = () => {
                         }
                       }}
                     />
-                    <label 
-                      className="form-check-label" 
+                    <label
+                      className="form-check-label"
                       htmlFor="remember-me"
                       style={{
                         userSelect: 'none',
@@ -367,9 +429,9 @@ const Login = () => {
                       Remember me
                     </label>
                   </div>
-                  
-                  <a 
-                    href="#" 
+
+                  <a
+                    href="#"
                     className="text-decoration-none"
                     style={{
                       color: '#0d6efd',
@@ -385,10 +447,10 @@ const Login = () => {
                     Forgot password?
                   </a>
                 </div>
-                
+
                 {error && (
-                  <div 
-                    className="alert alert-danger d-flex align-items-center mb-4" 
+                  <div
+                    className="alert alert-danger d-flex align-items-center mb-4"
                     role="alert"
                     style={{
                       display: 'flex',
@@ -407,7 +469,7 @@ const Login = () => {
                   </div>
                 )}
 
-                <div 
+                <div
                   className="d-grid"
                   style={{
                     display: 'grid'
@@ -445,9 +507,9 @@ const Login = () => {
                   >
                     {loading ? (
                       <>
-                        <span 
-                          className="spinner-border spinner-border-sm me-2" 
-                          role="status" 
+                        <span
+                          className="spinner-border spinner-border-sm me-2"
+                          role="status"
                           aria-hidden="true"
                           style={{
                             display: 'inline-block',
@@ -467,8 +529,8 @@ const Login = () => {
                 </div>
               </form>
             </div>
-            
-            <div 
+
+            <div
               className="card-footer text-center py-3 bg-light"
               style={{
                 padding: '0.75rem 1.25rem',
@@ -477,7 +539,7 @@ const Login = () => {
                 textAlign: 'center'
               }}
             >
-              <div 
+              <div
                 className="text-muted"
                 style={{
                   color: '#6c757d',
@@ -485,8 +547,8 @@ const Login = () => {
                 }}
               >
                 Don't have an account?{' '}
-                <a 
-                  href="/register" 
+                <a
+                  href="/register"
                   className="text-decoration-none fw-semibold"
                   style={{
                     color: '#0d6efd',
@@ -504,15 +566,15 @@ const Login = () => {
               </div>
             </div>
           </div>
-          
-          <div 
+
+          <div
             className="text-center mt-4"
             style={{
               marginTop: '1.5rem',
               textAlign: 'center'
             }}
           >
-            <p 
+            <p
               className="text-muted"
               style={{
                 color: '#6c757d',
@@ -524,11 +586,11 @@ const Login = () => {
           </div>
         </div>
       </div>
-      
+
       {/* Toast notification */}
-      <div 
-        className="position-fixed bottom-0 end-0 p-3" 
-        style={{ 
+      <div
+        className="position-fixed bottom-0 end-0 p-3"
+        style={{
           position: 'fixed',
           bottom: '0',
           right: '0',
@@ -536,10 +598,10 @@ const Login = () => {
           zIndex: '11'
         }}
       >
-        <div 
-          className={`toast ${showToast ? 'show' : 'hide'} text-white`} 
-          role="alert" 
-          aria-live="assertive" 
+        <div
+          className={`toast ${showToast ? 'show' : 'hide'} text-white`}
+          role="alert"
+          aria-live="assertive"
           aria-atomic="true"
           style={{
             width: '350px',
@@ -555,7 +617,7 @@ const Login = () => {
             pointerEvents: showToast ? 'auto' : 'none'
           }}
         >
-          <div 
+          <div
             className="d-flex"
             style={{
               display: 'flex',
@@ -563,7 +625,7 @@ const Login = () => {
               padding: '0.75rem'
             }}
           >
-            <div 
+            <div
               className="toast-body d-flex align-items-center"
               style={{
                 flex: '1',
@@ -573,23 +635,23 @@ const Login = () => {
               }}
             >
               {toastType === 'success' ? (
-                <svg 
-                  xmlns="http://www.w3.org/2000/svg" 
-                  width="16" 
-                  height="16" 
-                  fill="currentColor" 
-                  className="me-2" 
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="16"
+                  height="16"
+                  fill="currentColor"
+                  className="me-2"
                   viewBox="0 0 16 16"
                   style={{
                     flexShrink: '0'
                   }}
                 >
-                  <path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zm-3.97-3.03a.75.75 0 0 0-1.08.022L7.477 9.417 5.384 7.323a.75.75 0 0 0-1.06 1.06L6.97 11.03a.75.75 0 0 0 1.079-.02l3.992-4.99a.75.75 0 0 0-.01-1.05z"/>
+                  <path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zm-3.97-3.03a.75.75 0 0 0-1.08.022L7.477 9.417 5.384 7.323a.75.75 0 0 0-1.06 1.06L6.97 11.03a.75.75 0 0 0 1.079-.02l3.992-4.99a.75.75 0 0 0-.01-1.05z" />
                 </svg>
               ) : (
-                <AlertCircle 
-                  className="me-2" 
-                  size={16} 
+                <AlertCircle
+                  className="me-2"
+                  size={16}
                   style={{
                     flexShrink: '0'
                   }}
@@ -597,9 +659,9 @@ const Login = () => {
               )}
               <span>{toastMessage}</span>
             </div>
-            <button 
-              type="button" 
-              className="btn-close btn-close-white me-2 m-auto" 
+            <button
+              type="button"
+              className="btn-close btn-close-white me-2 m-auto"
               onClick={() => setShowToast(false)}
               style={{
                 boxSizing: 'content-box',
@@ -620,11 +682,11 @@ const Login = () => {
           </div>
         </div>
       </div>
-      
+
       {/* Background animation */}
-      <div 
-        className="position-fixed top-0 start-0 w-100 h-100" 
-        style={{ 
+      <div
+        className="position-fixed top-0 start-0 w-100 h-100"
+        style={{
           position: 'fixed',
           top: '0',
           left: '0',
@@ -635,28 +697,28 @@ const Login = () => {
           pointerEvents: 'none'
         }}
       >
-        <div 
-          className="position-absolute" 
-          style={{ 
+        <div
+          className="position-absolute"
+          style={{
             position: 'absolute',
-            top: '15%', 
-            left: '10%', 
-            width: '300px', 
-            height: '300px', 
-            borderRadius: '50%', 
+            top: '15%',
+            left: '10%',
+            width: '300px',
+            height: '300px',
+            borderRadius: '50%',
             background: 'radial-gradient(circle, rgba(63, 81, 181, 0.1) 0%, rgba(255,255,255,0) 70%)',
             animation: 'float 6s ease-in-out infinite'
           }}
         ></div>
-        <div 
-          className="position-absolute" 
-          style={{ 
+        <div
+          className="position-absolute"
+          style={{
             position: 'absolute',
-            bottom: '10%', 
-            right: '5%', 
-            width: '400px', 
-            height: '400px', 
-            borderRadius: '50%', 
+            bottom: '10%',
+            right: '5%',
+            width: '400px',
+            height: '400px',
+            borderRadius: '50%',
             background: 'radial-gradient(circle, rgba(25,135,84,0.1) 0%, rgba(255,255,255,0) 70%)',
             animation: 'float 8s ease-in-out infinite 2s'
           }}
