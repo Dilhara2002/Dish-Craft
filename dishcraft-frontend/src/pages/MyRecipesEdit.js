@@ -974,10 +974,11 @@ const MyRecipes = () => {
                 className="btn btn-primary"
                 style={{
                   borderRadius: '20px',
-                  padding: '8px 20px',
-                  fontWeight: '600',
-                  backgroundColor: '#ff6b6b',
-                  borderColor: '#ff6b6b'
+                padding: '8px 16px',
+                fontWeight: '600',
+                boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
+                backgroundColor: '#0D6EFD',
+                borderColor: '#0D6EFD'
                 }}
               >
                 Add New Recipe

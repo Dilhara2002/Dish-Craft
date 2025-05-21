@@ -20,5 +20,6 @@ public class Comment {
     private String text;       // Comment text
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
+    
 }
 

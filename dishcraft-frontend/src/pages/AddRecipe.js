@@ -13,6 +13,7 @@ const AddRecipe = () => {
   });
   const [imagePreview, setImagePreview] = useState(null);
   const [isUploading, setIsUploading] = useState(false);
+  const [showSuccessModal, setShowSuccessModal] = useState(false);
 
   const handleChange = (e) => {
     setForm({
@@ -66,13 +67,17 @@ const AddRecipe = () => {
       });
       
       setIsUploading(false);
-      alert('Recipe added successfully!');
-      navigate('/recipes');
+      setShowSuccessModal(true);
     } catch (error) {
       setIsUploading(false);
       console.error('Error adding recipe:', error);
       alert('Failed to add recipe');
     }
+  };
+
+  const handleCloseSuccessModal = () => {
+    setShowSuccessModal(false);
+    navigate('/recipes');
   };
 
   return (
@@ -210,6 +215,34 @@ const AddRecipe = () => {
           {isUploading ? 'Saving Recipe...' : 'Add Recipe'}
         </button>
       </form>
+
+      {/* Success Modal */}
+      {showSuccessModal && (
+        <div className="modal fade show" style={{ display: 'block', backgroundColor: 'rgba(0,0,0,0.5)' }}>
+          <div className="modal-dialog modal-dialog-centered">
+            <div className="modal-content">
+              <div className="modal-header bg-success text-white">
+                <h5 className="modal-title">Success!</h5>
+                <button type="button" className="btn-close btn-close-white" onClick={handleCloseSuccessModal}></button>
+              </div>
+              <div className="modal-body text-center py-4">
+                <div className="mb-3">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" fill="#28a745" className="bi bi-check-circle-fill" viewBox="0 0 16 16">
+                    <path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zm-3.97-3.03a.75.75 0 0 0-1.08.022L7.477 9.417 5.384 7.323a.75.75 0 0 0-1.06 1.06L6.97 11.03a.75.75 0 0 0 1.079-.02l3.992-4.99a.75.75 0 0 0-.01-1.05z"/>
+                  </svg>
+                </div>
+                <h4 className="mb-3">Recipe Added Successfully!</h4>
+                <p>Your new recipe has been saved and is now available.</p>
+              </div>
+              <div className="modal-footer justify-content-center">
+                <button type="button" className="btn btn-success" onClick={handleCloseSuccessModal}>
+                  Continue to Recipes
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
